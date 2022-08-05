@@ -6,7 +6,7 @@
     <ImageView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/card_clubs_04"
+        app:srcCompat="@drawable/card_back"
         android:id="@+id/single_card"
         android:layout_gravity="center"
         android:layout_weight="1"/>

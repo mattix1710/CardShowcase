@@ -1,3 +1,7 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="player_name_size">15sp</dimen>
+    <dimen name="player_cards_size">20sp</dimen>
+    <dimen name="player_card_margin">4dp</dimen>
+    <dimen name="current_card_info_size">20sp</dimen>
 </resources>

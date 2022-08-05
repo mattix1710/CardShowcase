@@ -1,11 +1,12 @@
 package com.example.cardshowcase.cardshandling
 
 enum class HouseType{
-    none, kier, karo, trefl, pik, joker
+    // none, kier, diamonds, trefl, spades, joker
+    none, Hearts, Diamonds, Clubs, Spades, Joker
 }
 
 enum class CardValue{
-    none, two, three, four, five, six, seven, eight, nine, ten, jack, queen, king, ace, joker
+    none, two, three, four, five, six, seven, eight, nine, ten, jack, queen, king, ace, red, black
 }
 
 class CardItem {
@@ -30,5 +31,24 @@ class CardItem {
 
     fun getCardValue(): CardValue{
         return value
+    }
+
+    fun getCardValueName(): String{
+        when(value){
+            CardValue.two -> return "2"
+            CardValue.three -> return "3"
+            CardValue.four -> return "4"
+            CardValue.five -> return "5"
+            CardValue.six -> return "6"
+            CardValue.seven -> return "7"
+            CardValue.eight -> return "8"
+            CardValue.nine -> return "9"
+            CardValue.ten -> return "10"
+            CardValue.jack -> return "Jack"
+            CardValue.queen -> return "Queen"
+            CardValue.king -> return "King"
+            CardValue.ace -> return "Ace"
+            else -> return "None"
+        }
     }
 }
