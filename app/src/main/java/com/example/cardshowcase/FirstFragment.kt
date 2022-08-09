@@ -1,20 +1,23 @@
 package com.example.cardshowcase
 
-import android.content.res.AssetManager
+import android.app.AlertDialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.GridView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.cardshowcase.cardshandling.CardAdapter
 import com.example.cardshowcase.cardshandling.CardItem
 import com.example.cardshowcase.cardshandling.CardValue
 import com.example.cardshowcase.cardshandling.HouseType
 import com.example.cardshowcase.databinding.FragmentFirstBinding
+import com.google.android.material.snackbar.Snackbar
 
 //INFO: ignore red marks on certain cards... everything is alright
 val cardsIds = arrayOf<Int>(
@@ -79,15 +82,16 @@ val cardsIds = arrayOf<Int>(
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment(), AdapterView.OnItemClickListener {
+class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private var _binding: FragmentFirstBinding? = null
 
     private var allPlayingCards = ArrayList<CardItem>()
     private var currentFreeCards = ArrayList<CardItem>()
+    private var usedPlayingCards = ArrayList<CardItem>()
     private var displayedCard: CardItem = CardItem(R.drawable.card_empty)
     private var freeCardsQuantity: Int = 0
-    private var penaltyActive: Boolean = false
+    private var penalty: Int = 0
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -118,7 +122,7 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener {
         displayedCard.getCardId()?.let { binding.displayedCard.setImageResource(it) }
 
         binding.buttonFirst.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            findNavController().navigate(R.id.action_FirstFragment_to_MainFragment)
         }
 
         binding.drawCard.setOnClickListener { drawNewCard() }
@@ -141,13 +145,20 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener {
         //draw a card for beginning a game
         displayedCard = currentFreeCards.get((0 until currentFreeCards.size).random())
         displayedCard.getCardId()?.let { binding.displayedCard.setImageResource(it) }
-        setCurrentCardInfo()
+        currentFreeCards.remove(displayedCard)
+        setCurrentCardInfo(wasFirst = true)
 
     }
 
-    private fun setCurrentCardInfo() {
+    // wasFirst - variable indicating that it was the card played at the beginning of the game
+    private fun setCurrentCardInfo(wasFirst: Boolean = false) {
         var value: String = displayedCard.getCardValueName()
         var house: String = displayedCard.getCardType().toString()
+
+        if(displayedCard.getCardValue() == CardValue.two && !wasFirst)
+            binding.currentCardName!!.setTextColor(resources.getColor(R.color.current_card_functional_info))
+        else
+            binding.currentCardName!!.setTextColor(resources.getColor(R.color.current_card_info))
 
         binding.currentCardName!!.text = "$value of $house"
     }
@@ -217,19 +228,42 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener {
     }
 
     private fun drawNewCard() {
-        if(currentFreeCards.isEmpty()){
-            Toast.makeText(requireContext(), "There are no cards left to draw!", Toast.LENGTH_SHORT).show()
-            return
+
+        var quantityToGet: Int
+        if(penalty == 0)
+            quantityToGet = 1
+        else {
+            quantityToGet = penalty
+            displayedCard.setCardPlayed()
         }
 
-        var randomizedCard: CardItem = currentFreeCards.get((0 until currentFreeCards.size).random())
-        cardAdapter!!.arrayList.add(randomizedCard)
+        for(it in 1..quantityToGet) {
+            shuffleUsedCards()
+            var randomizedCard: CardItem =
+                currentFreeCards.get((0 until currentFreeCards.size).random())
+            cardAdapter!!.arrayList.add(randomizedCard)
 
-        //update cardAdapter
-        freeCardsQuantity--
-        binding.currentFreeCards.text = freeCardsQuantity.toString()
+            //update cardAdapter
+            freeCardsQuantity--
+            binding.currentFreeCards.text = freeCardsQuantity.toString()
+            currentFreeCards.remove(randomizedCard)
+        }
+
+        // update the view
         cardAdapter!!.notifyDataSetChanged()
-        currentFreeCards.remove(randomizedCard)
+    }
+
+    private fun shuffleUsedCards(){
+        if(currentFreeCards.isEmpty()){
+            //if all the cards have players
+            if(usedPlayingCards.isEmpty()){
+                Toast.makeText(requireContext(), "There are no cards left to draw!", Toast.LENGTH_SHORT).show()
+                return
+            }
+            //if there are some leftover cards on the stack - place them into non-used cards stack
+            for(it in usedPlayingCards) currentFreeCards.add(it)
+            usedPlayingCards.clear()
+        }
     }
 
     private fun randomizeCardList(): ArrayList<CardItem>{
@@ -252,36 +286,97 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener {
         _binding = null
     }
 
-    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        var cardItem: CardItem = arrayList!!.get(position)
+    // INFO: WTF, adapterview overridden in CardAdapter class
+    override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+        var card: CardItem = arrayList!!.get(position)
 
-        if(cardGameLogic(cardItem, displayedCard)) {
+        Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
+
+/*        var backgroundSet: Boolean = (view!!.background == ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
+                || view!!.background == ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected_on_top))
+
+        if(backgroundSet){
+            view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_transparent)
+            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was unselected!", Snackbar.LENGTH_SHORT).show()
+        } else{
+            view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
+            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
+        }*/
+
+//        view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
+//        var scale: Float = requireContext().resources.displayMetrics.density
+        //view!!.setPadding((3 * scale + 0.5f).toInt())
+        //view!!.setElevation(24f)
+
+        //view!!.setBackgroundColor(R.color.green_item_selected)
+
+        //============================================
+
+        /*view!!.setOnClickListener(object: View.OnClickListener{
+            override fun onClick(view: View?) {
+                view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_highlight)
+                var scale: Float = requireContext().resources.displayMetrics.density
+                view!!.setPadding((3 * scale + 0.5f).toInt())
+                //Toast.makeText(context, "Card selected", Toast.LENGTH_SHORT).show()
+            }
+        })*/
+
+        //==============================================
+
+
+
+
+        /*if(view!!.background == resources.getDrawable(R.drawable.card_background_highlight))
+            view!!.background = resources.getDrawable(R.drawable.card_background_transparent)
+        else
+            view!!.background = resources.getDrawable(R.drawable.card_background_highlight)
+
+        parent!![position].background = resources.getDrawable(R.drawable.card_background_highlight)
+
+        cardAdapter!!.notifyDataSetChanged()*/
+
+        /*if(cardGameLogic(cardItem, displayedCard)) {
 
             // delete card from visible list
             arrayList!!.remove(cardItem)
 
             // INFO: when a card is chosen, current card on-deck goes to the available cards...
             if (!(displayedCard.getCardType() == HouseType.none && displayedCard.getCardValue() == CardValue.none)) {
-                currentFreeCards!!.add(displayedCard)
+                usedPlayingCards!!.add(displayedCard)
             }
             displayedCard = cardItem
             cardItem.getCardId()?.let { binding.displayedCard.setImageResource(it) }
 
-            // INFO: changing card quantity
-            freeCardsQuantity++
-            binding.currentFreeCards.text = freeCardsQuantity.toString()
+            // TO_DELETE: INFO: changing card quantity
+            //freeCardsQuantity++
+            //binding.currentFreeCards.text = freeCardsQuantity.toString()
 
             Toast.makeText(requireContext(), "Card was played!", Toast.LENGTH_SHORT).show()
 
             // change current card info
             setCurrentCardInfo()
 
+            Log.i("PLACE", "before penalty check")
+            penaltyCheckerAlertDialog(displayedCard, arrayList!!)
+
             // at the end: reset displayed data
             cardAdapter!!.notifyDataSetChanged()
         } else{
+            wrongCardAlertDialog(displayedCard)
+            //Snackbar.make(view, "Card cannot be played!", Snackbar.LENGTH_SHORT).show()
             Toast.makeText(requireContext(), "Card cannot be played!", Toast.LENGTH_SHORT).show()
-        }
+        }*/
 
+    }
+
+    // TODO: longClick doesn't response
+    override fun onItemLongClick(parent: AdapterView<*>?, view: View, position: Int, id: Long): Boolean {
+        var card: CardItem = arrayList!!.get(position)
+
+        //view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected_on_top)
+        Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
+
+        return true
     }
 
     private fun cardGameLogic(card: CardItem, onStackCard: CardItem): Boolean {
@@ -300,4 +395,59 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener {
             return true
         return false
     }
+
+    private fun wrongCardAlertDialog(cardOnStack: CardItem){
+        val alert = AlertDialog.Builder(requireContext())
+        alert.setMessage("This card can't be played!\nTry ${cardOnStack.getCardValueName()}s or ${cardOnStack.getCardType()}")
+        alert.setPositiveButton(
+            "OK"
+        ) { dialogInterface, i ->
+            // What to do after clicking "positive" button
+        }
+        alert.create().show()
+    }
+
+    private fun playChosenCards(){
+
+    }
+
+    ///////////////////////////////////
+    // PENALTIES
+    private fun penaltyCheckerAlertDialog(cardOnStack: CardItem, playerCards: ArrayList<CardItem>){
+        val alert = AlertDialog.Builder(requireContext())
+
+        var cardFound: Boolean = false
+
+        // check for 2s
+        if(cardOnStack.wasCardPlayed()){
+            displayedCard.resetCardPlayed()
+            binding.drawCardButton!!.text = "Draw a card"
+            penalty = 0
+        }
+        else {
+            for (it in playerCards) {
+                if (it.getCardValue() == CardValue.two && cardOnStack.getCardValue() == CardValue.two) {
+                    Log.i("PLACE", "Found card - 2")
+                    cardFound = true
+                    break
+                }
+            }
+        }
+
+        if(cardFound) {
+            penalty = penalty + 2
+            // set an alert that there is an option to revenge..., or just draw cards
+            alert.setMessage("You can play a 2 against the other 2 or draw $penalty cards.")
+            alert.setPositiveButton(
+                "I understand"
+            ) { dialogInterface, i ->
+
+            }
+            alert.create().show()
+
+            binding.drawCardButton!!.text = "Draw $penalty cards"
+        }
+
+    }
+
 }

@@ -3,9 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/drawable-v24/card_background_selected_on_top.xml" value="0.1075" />
+        <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/drawable/card_background_highlight.xml" value="0.1935" />
+        <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/drawable/card_background_transparent.xml" value="0.1665" />
         <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/layout-land/fragment_first.xml" value="0.30687830687830686" />
         <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/layout/activity_main.xml" value="0.15213675213675212" />
         <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/layout/fragment_first.xml" value="0.23497267759562843" />
+        <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/layout/fragment_second.xml" value="0.16222677595628415" />
         <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/layout/single_card.xml" value="0.26902173913043476" />
       </map>
     </option>

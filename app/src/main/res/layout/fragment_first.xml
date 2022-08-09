@@ -30,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="150dp"
                 android:layout_weight="1"
-                android:src="@drawable/card_empty" />
+                android:src="@drawable/card_empty"/>
 
             <ImageView
                 android:id="@+id/drawCard"
@@ -57,7 +57,7 @@
         android:layout_height="0dp"
         android:columnCount="4"
         android:rowCount="1"
-        app:layout_constraintBottom_toTopOf="@id/relativeLayout2"
+        app:layout_constraintBottom_toTopOf="@id/relativeLayoutCardList"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
 
         <androidx.cardview.widget.CardView
@@ -262,21 +262,27 @@
     </GridLayout>
 
     <RelativeLayout
-        android:id="@+id/relativeLayout2"
+        android:id="@+id/relativeLayoutCardList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/middleHorizontal_guideline">
+        app:layout_constraintBottom_toTopOf="@id/drawCardButton"
+        app:layout_constraintTop_toBottomOf="@id/middleHorizontal_guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <GridView
-            android:layout_margin="8dp"
             android:id="@+id/card_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:horizontalSpacing="15dp"
+            android:horizontalSpacing="5dp"
+            android:verticalSpacing="5dp"
             android:numColumns="4"
             tools:listitem="@layout/single_card">
 
@@ -313,7 +319,7 @@
         android:text="Cards left:"
         android:textSize="20sp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/relativeLayout2"
+        app:layout_constraintBottom_toTopOf="@+id/relativeLayoutCardList"
         app:layout_constraintEnd_toStartOf="@+id/current_free_cards"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
@@ -329,11 +335,32 @@
         android:id="@+id/current_card_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="5 of Spades"
+        android:text="@string/card_on_stack_info"
         android:textColor="@color/current_card_info"
         android:textSize="@dimen/current_card_info_size"
         app:layout_constraintBottom_toTopOf="@+id/players_info"
         app:layout_constraintEnd_toStartOf="@+id/middle_Vertical_guideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+
+    <Button
+        android:id="@+id/drawCardButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="true"
+        android:text="@string/draw_card_button_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/playCardbutton"
+        app:layout_constraintTop_toBottomOf="@id/relativeLayoutCardList" />
+
+    <Button
+        android:id="@+id/playCardbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/play_card_button_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/drawCardButton"
+        app:layout_constraintTop_toBottomOf="@id/relativeLayoutCardList"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

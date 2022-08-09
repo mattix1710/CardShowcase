@@ -14,6 +14,7 @@ class CardItem {
     private var cardID: Int? = 0
     private var type: HouseType = HouseType.none
     private var value: CardValue = CardValue.none
+    private var wasPlayed: Boolean = false
 
     constructor(cards: Int?, type: HouseType = HouseType.none, value: CardValue = CardValue.none){
         this.cardID = cards
@@ -50,5 +51,17 @@ class CardItem {
             CardValue.ace -> return "Ace"
             else -> return "None"
         }
+    }
+
+    fun setCardPlayed(){
+        this.wasPlayed = true
+    }
+
+    fun resetCardPlayed(){
+        this.wasPlayed = false
+    }
+
+    fun wasCardPlayed(): Boolean{
+        return wasPlayed
     }
 }

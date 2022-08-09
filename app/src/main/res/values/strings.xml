@@ -2,11 +2,15 @@
     <string name="app_name">CardShowcase</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="first_fragment_label">The game</string>
+    <string name="main_fragment_label">Main Meniu</string>
     <string name="next">Next</string>
-    <string name="previous">Previous</string>
+    <string name="start_game">Start game</string>
 
     <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="hello_second_fragment">Hello main fragment. Arg: %1$s</string>
+    <string name="game_title">Cards Against Connectivity</string>
+    <string name="draw_card_button_text">Draw a card</string>
+    <string name="play_card_button_text">Play a card</string>
+    <string name="card_on_stack_info">Card on Stack</string>
 </resources>

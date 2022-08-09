@@ -59,7 +59,7 @@
         app:layout_constraintGuide_percent="0.5"/>
 
     <RelativeLayout
-        android:id="@+id/relativeLayout2"
+        android:id="@+id/relativeLayoutCardList"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -109,7 +109,7 @@
         android:layout_height="wrap_content"
         android:text="Cards left:"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/relativeLayout2"
+        app:layout_constraintBottom_toTopOf="@+id/relativeLayoutCardList"
         app:layout_constraintEnd_toStartOf="@+id/current_free_cards"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />

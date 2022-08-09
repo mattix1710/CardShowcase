@@ -14,6 +14,10 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // shadows for imageview
+//        renderscriptTargetApi 18
+//        renderscriptSupportModeEnabled true
     }
 
     buildTypes {
@@ -46,4 +50,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation 'androidx.cardview:cardview:1.0.0'
+
+    // shadows for imageview
+    //implementation 'com.qhutch.elevationimageview:elevationimageview:2.4'
 }

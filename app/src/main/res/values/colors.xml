@@ -8,9 +8,13 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="transparent">#00000000</color>
     <color name="green_background">#6DA258</color>
+    <color name="green_item_selected">#598547</color>
+    <color name="green_item_selected_on_top">#436336</color>
     <color name="dark_green_tile_background">#4C703D</color>
     <color name="player_chosen">#F5CC4D</color>
     <color name="player_color">#323232</color>
     <color name="current_card_info">#F5CC4D</color>
+    <color name="current_card_functional_info">#C40000</color>
 </resources>
