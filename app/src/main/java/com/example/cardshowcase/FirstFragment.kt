@@ -19,6 +19,7 @@ import com.example.cardshowcase.cardshandling.HouseType
 import com.example.cardshowcase.databinding.FragmentFirstBinding
 import com.google.android.material.snackbar.Snackbar
 
+
 //INFO: ignore red marks on certain cards... everything is alright
 val cardsIds = arrayOf<Int>(
     R.drawable.card_hearts_a,
@@ -92,6 +93,7 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
     private var displayedCard: CardItem = CardItem(R.drawable.card_empty)
     private var freeCardsQuantity: Int = 0
     private var penalty: Int = 0
+    private var selectedCards = ArrayList<Int>()            // list of selected cards positions
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -148,6 +150,31 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
         currentFreeCards.remove(displayedCard)
         setCurrentCardInfo(wasFirst = true)
 
+
+        // INFO: there need to be implemented both of onItemClick (regular and long) of AdapterView <- however they can be empty
+        // INFO: and then these function below can be used
+
+        gridView!!.onItemClickListener =
+            AdapterView.OnItemClickListener(){ parent, view, position, id -> clickOnCard(position, view)}
+
+        gridView!!.onItemLongClickListener =
+            AdapterView.OnItemLongClickListener() { parent, view, position, id -> longClickOnCard(position, view) }
+
+    }
+
+    private fun clickOnCard(position: Int, view: View) {
+        var card: CardItem = arrayList!!.get(position)
+
+        Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun longClickOnCard(position: Int, view: View): Boolean {
+        var card: CardItem = arrayList!!.get(position)
+
+        view.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected_on_top)
+        Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
+
+        return true
     }
 
     // wasFirst - variable indicating that it was the card played at the beginning of the game
@@ -286,13 +313,13 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
         _binding = null
     }
 
-    // INFO: WTF, adapterview overridden in CardAdapter class
+    // INFO: these have to be overridden, but the functions are used inside "onViewCreated()"
     override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
-        var card: CardItem = arrayList!!.get(position)
+/*        var card: CardItem = arrayList!!.get(position)
 
         Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
 
-/*        var backgroundSet: Boolean = (view!!.background == ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
+        var backgroundSet: Boolean = (view!!.background == ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
                 || view!!.background == ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected_on_top))
 
         if(backgroundSet){
@@ -301,41 +328,41 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
         } else{
             view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
             Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
-        }*/
+        }
 
-//        view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
-//        var scale: Float = requireContext().resources.displayMetrics.density
-        //view!!.setPadding((3 * scale + 0.5f).toInt())
-        //view!!.setElevation(24f)
+        view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
+        var scale: Float = requireContext().resources.displayMetrics.density
+        view!!.setPadding((3 * scale + 0.5f).toInt())
+        view!!.setElevation(24f)
 
-        //view!!.setBackgroundColor(R.color.green_item_selected)
+        view!!.setBackgroundColor(R.color.green_item_selected)
 
         //============================================
 
-        /*view!!.setOnClickListener(object: View.OnClickListener{
+        view!!.setOnClickListener(object: View.OnClickListener{
             override fun onClick(view: View?) {
                 view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_highlight)
                 var scale: Float = requireContext().resources.displayMetrics.density
                 view!!.setPadding((3 * scale + 0.5f).toInt())
                 //Toast.makeText(context, "Card selected", Toast.LENGTH_SHORT).show()
             }
-        })*/
+        })
 
         //==============================================
 
 
 
 
-        /*if(view!!.background == resources.getDrawable(R.drawable.card_background_highlight))
+        if(view!!.background == resources.getDrawable(R.drawable.card_background_highlight))
             view!!.background = resources.getDrawable(R.drawable.card_background_transparent)
         else
             view!!.background = resources.getDrawable(R.drawable.card_background_highlight)
 
         parent!![position].background = resources.getDrawable(R.drawable.card_background_highlight)
 
-        cardAdapter!!.notifyDataSetChanged()*/
+        cardAdapter!!.notifyDataSetChanged()
 
-        /*if(cardGameLogic(cardItem, displayedCard)) {
+        if(cardGameLogic(cardItem, displayedCard)) {
 
             // delete card from visible list
             arrayList!!.remove(cardItem)
@@ -371,11 +398,11 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
 
     // TODO: longClick doesn't response
     override fun onItemLongClick(parent: AdapterView<*>?, view: View, position: Int, id: Long): Boolean {
-        var card: CardItem = arrayList!!.get(position)
+        /*var card: CardItem = arrayList!!.get(position)
 
         //view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected_on_top)
         Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
-
+*/
         return true
     }
 
