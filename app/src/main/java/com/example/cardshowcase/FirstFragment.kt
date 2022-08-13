@@ -8,15 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.GridView
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.cardshowcase.cardshandling.CardAdapter
-import com.example.cardshowcase.cardshandling.CardItem
-import com.example.cardshowcase.cardshandling.CardValue
-import com.example.cardshowcase.cardshandling.HouseType
+import androidx.recyclerview.widget.RecyclerView
+import com.example.cardshowcase.cardshandling.*
 import com.example.cardshowcase.databinding.FragmentFirstBinding
+import com.google.android.flexbox.*
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -83,7 +83,7 @@ val cardsIds = arrayOf<Int>(
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+class FirstFragment : Fragment(), CardListListener {
 
     private var _binding: FragmentFirstBinding? = null
 
@@ -103,6 +103,7 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
     private var arrayList: ArrayList<CardItem> ? = null
     private var cardAdapter:CardAdapter ? = null
 
+    private var recyclerView: RecyclerView? = null
 
     // onCreateView - trying to use only for view inflaters
     override fun onCreateView(
@@ -129,9 +130,35 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
 
         binding.drawCard.setOnClickListener { drawNewCard() }
 
-        gridView = binding.cardList
 
-        // populating arrays
+
+        //gridView = binding.cardList
+
+        //////////////////////////////////////
+        // for recyclerView
+        populateCardDeck()
+        allPlayingCards = currentFreeCards
+        freeCardsQuantity = currentFreeCards.size
+
+        // draw cards to players hand (view)
+        arrayList = randomizeCardList()
+        cardAdapter = CardAdapter(arrayList!!, this@FirstFragment, requireContext())
+
+        recyclerView = binding.cardListView
+        recyclerView!!.adapter = cardAdapter
+
+        var layoutManager = FlexboxLayoutManager(requireContext())
+        layoutManager.flexDirection = FlexDirection.ROW
+        //layoutManager.alignContent = AlignContent.FLEX_START
+        layoutManager.alignItems = AlignItems.STRETCH
+        layoutManager.justifyContent = JustifyContent.CENTER
+        layoutManager.flexWrap = FlexWrap.WRAP
+
+        recyclerView!!.layoutManager = layoutManager
+
+        //////////////////////////////////////
+
+        /*// populating arrays
         populateCardDeck()
         allPlayingCards = currentFreeCards
         //for(card in cardsIds) currentFreeCards.add(CardItem(card))
@@ -142,7 +169,7 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
         arrayList = randomizeCardList()
         cardAdapter = CardAdapter(requireContext(), arrayList!!)
         gridView?.adapter = cardAdapter
-        gridView?.onItemClickListener = this
+        gridView?.onItemClickListener = this*/
 
         //draw a card for beginning a game
         displayedCard = currentFreeCards.get((0 until currentFreeCards.size).random())
@@ -153,18 +180,56 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
 
         // INFO: there need to be implemented both of onItemClick (regular and long) of AdapterView <- however they can be empty
         // INFO: and then these function below can be used
+/*
 
         gridView!!.onItemClickListener =
-            AdapterView.OnItemClickListener(){ parent, view, position, id -> clickOnCard(position, view)}
+            AdapterView.OnItemClickListener(){ parent, view, position, id -> clickOnCard(position, view, parent)}
 
         gridView!!.onItemLongClickListener =
             AdapterView.OnItemLongClickListener() { parent, view, position, id -> longClickOnCard(position, view) }
+*/
+
+
 
     }
 
-    private fun clickOnCard(position: Int, view: View) {
+    override fun onItemClick(position: Int, view: View) {
+        Log.i("Card_click", "card_${position}")
+
         var card: CardItem = arrayList!!.get(position)
 
+        // TODO: create coherent logic of chosen cards (must be of the same house or value)
+
+        if(card.isSelected() || card.isSelectedOnTop()){
+            card.resetSelected()
+            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was unselected!", Snackbar.LENGTH_SHORT).show()
+        }else{
+            card.resetSelected()
+            card.setSelected()
+            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
+        }
+
+        cardAdapter!!.notifyDataSetChanged()
+    }
+
+    override fun onItemLongClick(position: Int, view: View) {
+        var card: CardItem = arrayList!!.get(position)
+
+        if(!card.isSelectedOnTop()){
+            card.resetSelected()
+            card.setSelectedOnTop()
+            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
+        }
+
+        cardAdapter!!.notifyDataSetChanged()
+    }
+
+    private fun clickOnCard(position: Int, view: View, parent: AdapterView<*>) {
+        var card: CardItem = arrayList!!.get(position)
+
+        view.isSelected = true
+
+        view.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
         Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
     }
 
@@ -268,7 +333,7 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
             shuffleUsedCards()
             var randomizedCard: CardItem =
                 currentFreeCards.get((0 until currentFreeCards.size).random())
-            cardAdapter!!.arrayList.add(randomizedCard)
+            cardAdapter!!.cardList.add(randomizedCard)
 
             //update cardAdapter
             freeCardsQuantity--
@@ -314,9 +379,10 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
     }
 
     // INFO: these have to be overridden, but the functions are used inside "onViewCreated()"
-    override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
-/*        var card: CardItem = arrayList!!.get(position)
+/*    override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+*//*        var card: CardItem = arrayList!!.get(position)
 
+        view.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
         Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
 
         var backgroundSet: Boolean = (view!!.background == ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected)
@@ -392,19 +458,19 @@ class FirstFragment : Fragment(), AdapterView.OnItemClickListener, AdapterView.O
             wrongCardAlertDialog(displayedCard)
             //Snackbar.make(view, "Card cannot be played!", Snackbar.LENGTH_SHORT).show()
             Toast.makeText(requireContext(), "Card cannot be played!", Toast.LENGTH_SHORT).show()
-        }*/
+        }*//*
 
     }
 
     // TODO: longClick doesn't response
     override fun onItemLongClick(parent: AdapterView<*>?, view: View, position: Int, id: Long): Boolean {
-        /*var card: CardItem = arrayList!!.get(position)
+        *//*var card: CardItem = arrayList!!.get(position)
 
         //view!!.background = ContextCompat.getDrawable(requireContext(), R.drawable.card_background_selected_on_top)
         Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
-*/
+*//*
         return true
-    }
+    }*/
 
     private fun cardGameLogic(card: CardItem, onStackCard: CardItem): Boolean {
         // SIMPLE RULES

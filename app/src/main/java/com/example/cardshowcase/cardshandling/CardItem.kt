@@ -11,18 +11,20 @@ enum class CardValue{
 
 class CardItem {
 
-    private var cardID: Int? = 0
+    private var cardID: Int = 0
     private var type: HouseType = HouseType.none
     private var value: CardValue = CardValue.none
     private var wasPlayed: Boolean = false
+    private var isSelected: Boolean = false
+    private var isSelectedOnTop: Boolean = false
 
-    constructor(cards: Int?, type: HouseType = HouseType.none, value: CardValue = CardValue.none){
-        this.cardID = cards
+    constructor(imageCard: Int, type: HouseType = HouseType.none, value: CardValue = CardValue.none){
+        this.cardID = imageCard
         this.type = type
         this.value = value
     }
 
-    fun getCardId(): Int? {
+    fun getCardId(): Int {
         return cardID
     }
 
@@ -63,5 +65,26 @@ class CardItem {
 
     fun wasCardPlayed(): Boolean{
         return wasPlayed
+    }
+
+    fun setSelected(){
+        this.isSelected = true
+    }
+
+    fun resetSelected(){
+        this.isSelected = false
+        this.isSelectedOnTop = false
+    }
+
+    fun setSelectedOnTop(){
+        this.isSelectedOnTop = true
+    }
+
+    fun isSelected(): Boolean{
+        return this.isSelected
+    }
+
+    fun isSelectedOnTop(): Boolean{
+        return this.isSelectedOnTop
     }
 }

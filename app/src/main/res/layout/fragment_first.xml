@@ -57,7 +57,7 @@
         android:layout_height="0dp"
         android:columnCount="4"
         android:rowCount="1"
-        app:layout_constraintBottom_toTopOf="@id/relativeLayoutCardList"
+        app:layout_constraintBottom_toTopOf="@id/card_list_view"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
 
         <androidx.cardview.widget.CardView
@@ -261,7 +261,7 @@
         </androidx.cardview.widget.CardView>
     </GridLayout>
 
-    <RelativeLayout
+    <!--<RelativeLayout
         android:id="@+id/relativeLayoutCardList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -283,12 +283,79 @@
             android:gravity="center"
             android:horizontalSpacing="5dp"
             android:verticalSpacing="5dp"
-            android:numColumns="4"
+            android:numColumns="10"
             tools:listitem="@layout/single_card">
 
         </GridView>
 
-    </RelativeLayout>
+    </RelativeLayout>-->
+
+    <!--<ScrollView
+        android:id="@+id/card_list_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:fillViewport="false"
+        app:layout_constraintTop_toBottomOf="@+id/middleHorizontal_guideline"
+        app:layout_constraintBottom_toTopOf="@+id/drawCardButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_margin="4dp"
+            android:id="@+id/card_list_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:alignContent="flex_start"
+            app:alignItems="stretch"
+            app:justifyContent="center"
+            app:flexWrap="wrap"
+            app:layout_constraintTop_toBottomOf="@+id/middleHorizontal_guideline"
+            app:layout_constraintBottom_toTopOf="@+id/drawCardButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </com.google.android.flexbox.FlexboxLayout>
+    </ScrollView>-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/card_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        app:layout_constraintTop_toBottomOf="@id/middleHorizontal_guideline"
+        app:layout_constraintBottom_toTopOf="@id/drawCardButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
 
     <Button
         android:id="@+id/button_first"
@@ -319,7 +386,7 @@
         android:text="Cards left:"
         android:textSize="20sp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/relativeLayoutCardList"
+        app:layout_constraintBottom_toTopOf="@+id/card_list_view"
         app:layout_constraintEnd_toStartOf="@+id/current_free_cards"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
@@ -352,7 +419,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/playCardbutton"
-        app:layout_constraintTop_toBottomOf="@id/relativeLayoutCardList" />
+        app:layout_constraintTop_toBottomOf="@id/card_list_view" />
 
     <Button
         android:id="@+id/playCardbutton"
@@ -361,6 +428,6 @@
         android:text="@string/play_card_button_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/drawCardButton"
-        app:layout_constraintTop_toBottomOf="@id/relativeLayoutCardList"
+        app:layout_constraintTop_toBottomOf="@id/card_list_view"
         app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

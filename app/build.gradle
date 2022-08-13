@@ -51,6 +51,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation 'androidx.cardview:cardview:1.0.0'
 
-    // shadows for imageview
-    //implementation 'com.qhutch.elevationimageview:elevationimageview:2.4'
+    // flexbox layout
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 }
