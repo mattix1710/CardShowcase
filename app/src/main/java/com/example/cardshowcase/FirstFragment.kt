@@ -563,6 +563,7 @@ class FirstFragment : Fragment(), CardListListener {
         _binding = null
     }
 
+    // TODO: card game logic
     private fun cardGameLogic(card: CardItem, onStackCard: CardItem): Boolean {
         // SIMPLE RULES
         //
@@ -615,7 +616,7 @@ class FirstFragment : Fragment(), CardListListener {
     }
 
     ///////////////////////////////////
-    // PENALTIES
+    // TODO: PENALTIES
     private fun penaltyCheckerAlertDialog(cardOnStack: CardItem, playerCards: ArrayList<CardItem>){
         val alert = AlertDialog.Builder(requireContext())
 
@@ -653,41 +654,8 @@ class FirstFragment : Fragment(), CardListListener {
 
     }
 
-    /** returns true whether there are matching cards in hand
-     * OR there is no card selected yet - but selected card matches the one onStack
-     * **/
-    private fun checkSelectedCardsCompatibility(current: CardItem, view: View, onTop: Boolean = false): Boolean{
-
-        var ifAlreadySelected: Boolean = false
-
-        for(card in playerCards!!){
-            if(card.isSelected() || card.isSelectedOnTop()) {       // check if any card in Hand is selected
-                ifAlreadySelected = true
-                if (card.getCardValue() == current.getCardValue())  // and matches the value of selected card
-                    continue
-                else {                                              // if doesn't match the value
-                    Snackbar.make(
-                        view,
-                        "This card cannot be selected among the currently chosen!",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                    return false
-                }
-            }
-        }
-
-        // if there are other cards OR there is no card selected (in onClick functions there are assignments to ".one")
-        if(current.getCardValue() == displayedCard.getCardValue())
-            selectedCards.selectionType = SelectedCardsStruct.SelectionType.value
-        else if(current.getCardType() == displayedCard.getCardType())
-            selectedCards.selectionType = SelectedCardsStruct.SelectionType.house
-        else{
-            if(!ifAlreadySelected)      // if current card doesn't match displayedCard AND no card was selected before
-                return false
-        }
-
-        return true
-    }
+    ////////////////////////////////////////////////
+    // OTHER updating functions
 
     private fun resetSelectedCards(){
         selectedCards.list.clear()

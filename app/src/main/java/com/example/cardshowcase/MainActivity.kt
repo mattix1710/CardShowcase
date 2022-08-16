@@ -53,12 +53,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // TODO: fill and set proper manual view
     private fun displayManualDialog(): Boolean {
         var inflater = LayoutInflater.from(this)
         var view = inflater.inflate(R.layout.manual_dialog, null)
 
         var manualDialog = AlertDialog.Builder(this)
-        manualDialog.setTitle("Instrukcja")
+        manualDialog.setTitle("Macao - MANUAL")
         manualDialog.setView(view)
         manualDialog.setPositiveButton("I understand", null)
         manualDialog.create().show()
