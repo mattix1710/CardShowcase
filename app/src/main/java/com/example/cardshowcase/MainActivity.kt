@@ -1,6 +1,7 @@
 package com.example.cardshowcase
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -9,6 +10,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import com.example.cardshowcase.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -46,8 +48,22 @@ class MainActivity : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> true
+            R.id.action_manual -> displayManualDialog()
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun displayManualDialog(): Boolean {
+        var inflater = LayoutInflater.from(this)
+        var view = inflater.inflate(R.layout.manual_dialog, null)
+
+        var manualDialog = AlertDialog.Builder(this)
+        manualDialog.setTitle("Instrukcja")
+        manualDialog.setView(view)
+        manualDialog.setPositiveButton("I understand", null)
+        manualDialog.create().show()
+
+        return true
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -13,4 +13,8 @@
     <string name="draw_card_button_text">Draw a card</string>
     <string name="play_card_button_text">Play a card</string>
     <string name="card_on_stack_info">Card on Stack</string>
+    <string name="manual_subtitle_1">Gameplay</string>
+    <string name="manual_contents_1">2 or more players (up to 10) are dealt 5 cards each; the deck is then cut and the cut card becomes the first card in the discard pile. Play starts to the dealer\'s right. \n\nThe next card played must be of the same suit or the same value as the card on the top of the discard pile. If a 7 of spades was on the top of the discard pile, the player can play a 9 of spades or a 7 of clubs. Alternatively, an Ace or Joker can be played. If the player cannot play a card, they must draw from the deck.\n\nCards can be played in runs, i.e. 5 of Spades, 6 of Spades, 7 of Spades, 7 of Hearts, 8 of Hearts, 8 of Clubs, 7 of Clubs.\n\nWhen an action card is played, the player next in sequence must complete the action or add to it to pass it onto the next player in sequence. When down to a single card, a player must say "Macau!". If an opponent calls Macau before the player, the player must draw a card. The winner of the game is the first player to have no cards; in instances of more than 2 players, gameplay continues until only one player is left with cards.</string>
+    <string name="action_manual">Manual</string>
+    <string name="manual_subtitle_2">Action Cards</string>
 </resources>
