@@ -1,13 +1,9 @@
-package com.example.cardshowcase.cardshandling
+package com.example.cardshowcase.cardsHandling
 
-import android.app.Activity
 import android.widget.ImageView
 import android.widget.TextView
 import com.example.cardshowcase.R
-import com.example.cardshowcase.*
 import android.content.Context
-import android.content.res.Resources
-import android.util.Log
 import android.widget.Toast
 
 class CardManager(val context: Context){
@@ -88,9 +84,59 @@ class CardManager(val context: Context){
     }
 
     // TODO: managePlayingCards - fajnie by było tu wrzucić, ale od cholery jest argumentów do przesłania
-    /*fun managePlayingCards(selectedCards: ArrayList<Int>, displayedImg: ImageView, ){
+    fun managePlayingCards(selectedCards: ArrayList<Int>,
+                           playerCards: ArrayList<CardItem>,
+                           displayedImg: ImageView,
+                           displayedInfo: TextView){
+        var cardsChosen = ArrayList<CardItem>()
 
-    }*/
+        for(it in selectedCards){
+            cardsChosen.add(playerCards[it])
+        }
+
+        // set card ON TOP as a displayedCard
+        for(card in cardsChosen){
+            if(card.isSelectedOnTop()){
+                usedPlayingCards.add(displayedCard)
+                card.resetSelected()
+                displayedCard = card
+                displayedImg.setImageResource(displayedCard.getCardId())
+                playerCards.remove(card)
+                cardsChosen.remove(card)
+                break
+            }
+        }
+
+        // for rest of the cards
+        for(card in cardsChosen){
+            card.resetSelected()
+            usedPlayingCards.add(card)
+            playerCards.remove(card)
+        }
+
+        if(selectedCards.size == 1)
+            Toast.makeText(context, "You played ${selectedCards.size} card!", Toast.LENGTH_SHORT).show()
+        else
+            Toast.makeText(context, "You played ${selectedCards.size} cards!", Toast.LENGTH_SHORT).show()
+
+        setCurrentCardInfo(displayedInfo)
+
+    }
+
+    fun drawCardFromStack(playerCards: ArrayList<CardItem>,
+                          cardAdapter: CardAdapter){
+        var quantityToGet: Int = 1
+
+        for(it in 1..quantityToGet){
+            if(shuffleUsedCards()){         // if there are some cards available
+                var randomizedCard: CardItem = drawFromFreeCards()
+                playerCards.add(randomizedCard)
+                currentFreeCards.remove(randomizedCard)
+            }
+        }
+
+        cardAdapter.notifyDataSetChanged()
+    }
 
     private fun populateCardDeck() {
 

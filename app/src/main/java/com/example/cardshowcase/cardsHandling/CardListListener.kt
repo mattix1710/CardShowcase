@@ -1,4 +1,4 @@
-package com.example.cardshowcase.cardshandling
+package com.example.cardshowcase.cardsHandling
 
 import android.view.View
 

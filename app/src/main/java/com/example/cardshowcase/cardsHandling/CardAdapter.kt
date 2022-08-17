@@ -1,4 +1,4 @@
-package com.example.cardshowcase.cardshandling
+package com.example.cardshowcase.cardsHandling
 
 import android.content.Context
 import android.view.LayoutInflater

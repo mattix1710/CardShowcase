@@ -6,13 +6,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.example.cardshowcase.cardshandling.*
+import com.example.cardshowcase.cardsHandling.*
 import com.example.cardshowcase.databinding.FragmentFirstBinding
-import com.example.cardshowcase.players.Player
+import com.example.cardshowcase.playerHandling.Player
 import com.google.android.flexbox.*
 import com.google.android.material.snackbar.Snackbar
 
@@ -43,24 +42,25 @@ class FirstFragment : Fragment(), CardListListener {
     //
     private val thisPlayerNum: Int = 1
     private var players = ArrayList<Player>()
-    private var playerCards: ArrayList<CardItem> ? = null
 
-    class SelectedCardsStruct{
-        enum class SelectionType{
-            one, house, value
-        }
-        val MAX_SELECTED = 4
-        private var if2sPlay: Boolean = true
-
-        var list = ArrayList<Int>()
-        var selectionType: SelectionType = SelectedCardsStruct.SelectionType.one
-        var selectionValue: CardValue = CardValue.none
-
-        fun twosPlaying(): Boolean{
-            return if2sPlay
-        }
-    }
-    private var selectedCards = SelectedCardsStruct()            // list of selected cards positions
+//    private var playerCards: ArrayList<CardItem> ? = null
+//
+//    class SelectedCardsStruct{
+//        enum class SelectionType{
+//            one, house, value
+//        }
+//        val MAX_SELECTED = 4
+//        private var if2sPlay: Boolean = true
+//
+//        var list = ArrayList<Int>()
+//        var selectionType: SelectionType = SelectedCardsStruct.SelectionType.one
+//        var selectionValue: CardValue = CardValue.none
+//
+//        fun twosPlaying(): Boolean{
+//            return if2sPlay
+//        }
+//    }
+//    private var selectedCards = SelectedCardsStruct()            // list of selected cards positions
     private var cardAdapter: CardAdapter? = null
     //
     //////////////////////////////////////////////
@@ -88,14 +88,14 @@ class FirstFragment : Fragment(), CardListListener {
             findNavController().navigate(R.id.action_FirstFragment_to_MainFragment)
         }
 
-        binding.drawCard.setOnClickListener { drawNewCard() }
-
-        binding.playCardbutton!!.setOnClickListener{ playCards() }
-        playCardsButtonUpdate()
+        players.add(Player("Player 1", 1, requireContext(), cardManager))
 
         // draw cards to players hand (view)
-        playerCards = cardManager.randomizeCardList()
-        cardAdapter = CardAdapter(playerCards!!, this@FirstFragment, requireContext())
+        //playerCards = cardManager.randomizeCardList()
+        players.get(0).initPlayerCards(cardManager.randomizeCardList())
+
+        //cardAdapter = CardAdapter(playerCards!!, this@FirstFragment, requireContext())
+        cardAdapter = CardAdapter(players[0].playerCards, this@FirstFragment, requireContext())
 
         recyclerView = binding.cardListView
         recyclerView!!.adapter = cardAdapter
@@ -109,6 +109,17 @@ class FirstFragment : Fragment(), CardListListener {
 
         recyclerView!!.layoutManager = layoutManager
 
+        //////////////////////////////////////////////////
+        // binding button with onClickListeners
+        //
+        binding.drawCardButton!!.setOnClickListener {
+            cardManager.drawCardFromStack(players[0].playerCards, cardAdapter!!)
+            updatePlayerInfo()
+        }
+        binding.drawCard.setOnClickListener { drawNewCard() }
+        binding.playCardbutton!!.setOnClickListener{ playCards() }
+        playCardsButtonUpdate()
+
         //draw a card for beginning a game
         cardManager?.setInitialDisplayedCard(binding.displayedCard, binding.currentCardName!!)
     }
@@ -118,92 +129,96 @@ class FirstFragment : Fragment(), CardListListener {
     override fun onItemClick(position: Int, view: View) {
         Log.i("Card_click", "card_${position}")
 
-        var card: CardItem = playerCards!!.get(position)        // REMEMBER!: it's passed by reference
+        players[0].selectedCard(position)
 
-        // TODO: Instead of Snackbar -> Toast.LONG
-
-        if(selectedCards.list.size == selectedCards.MAX_SELECTED){
-            notifyMaxCardsSelected()
-        }
-        else if(selectedCards.list.isEmpty()){                   // if there are no cards selected
-            card.resetSelected()
-            card.setSelectedOnTop()
-            selectedCards.list.add(position)
-            selectedCards.selectionType = SelectedCardsStruct.SelectionType.one
-            selectedCards.selectionValue = card.getCardValue()
-            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
-        } else if(selectedCards.list.contains(position)) {  // if current card was selected - unselect it!
-            card.resetSelected()
-            selectedCards.list.remove(position)
-            if(selectedCards.list.isEmpty()){
-                resetSelectedCards()
-            }
-            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was unselected!", Snackbar.LENGTH_SHORT).show()
-
-        } else if(selectedCards.selectionValue == card.getCardValue()){
-            card.resetSelected()
-            card.setSelected()
-            selectedCards.list.add(position)
-            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
-
-            if(card.getCardValue() ==  cardManager.displayedCard.getCardValue())
-                selectedCards.selectionType = SelectedCardsStruct.SelectionType.value
-            else
-                selectedCards.selectionType = SelectedCardsStruct.SelectionType.house
-        } else{
-            wrongCardAlertDialog()
-        }
+//        var card: CardItem = playerCards!!.get(position)        // REMEMBER!: it's passed by reference
+//
+//        // TODO: Instead of Snackbar -> Toast.LONG
+//
+//        if(selectedCards.list.size == selectedCards.MAX_SELECTED){
+//            notifyMaxCardsSelected()
+//        }
+//        else if(selectedCards.list.isEmpty()){                   // if there are no cards selected
+//            card.resetSelected()
+//            card.setSelectedOnTop()
+//            selectedCards.list.add(position)
+//            selectedCards.selectionType = SelectedCardsStruct.SelectionType.one
+//            selectedCards.selectionValue = card.getCardValue()
+//            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
+//        } else if(selectedCards.list.contains(position)) {  // if current card was selected - unselect it!
+//            card.resetSelected()
+//            selectedCards.list.remove(position)
+//            if(selectedCards.list.isEmpty()){
+//                resetSelectedCards()
+//            }
+//            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was unselected!", Snackbar.LENGTH_SHORT).show()
+//
+//        } else if(selectedCards.selectionValue == card.getCardValue()){
+//            card.resetSelected()
+//            card.setSelected()
+//            selectedCards.list.add(position)
+//            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
+//
+//            if(card.getCardValue() ==  cardManager.displayedCard.getCardValue())
+//                selectedCards.selectionType = SelectedCardsStruct.SelectionType.value
+//            else
+//                selectedCards.selectionType = SelectedCardsStruct.SelectionType.house
+//        } else{
+//            wrongCardAlertDialog()
+//        }
 
         playCardsButtonUpdate()
         cardAdapter!!.notifyDataSetChanged()
     }
 
     override fun onItemLongClick(position: Int, view: View) {
-        var card: CardItem = playerCards!!.get(position)
+//        var card: CardItem = playerCards!!.get(position)
+//
+//        // TODO: Instead of Snackbar -> Toast.LONG
+//
+//        if(selectedCards.list.size == selectedCards.MAX_SELECTED){
+//            notifyMaxCardsSelected()
+//        }
+//        else if(selectedCards.list.isEmpty()){                   // if there are no cards selected
+//            card.resetSelected()
+//            card.setSelectedOnTop()
+//            selectedCards.list.add(position)
+//            selectedCards.selectionType = SelectedCardsStruct.SelectionType.one
+//            selectedCards.selectionValue = card.getCardValue()
+//            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
+//        } else if(selectedCards.list.contains(position)){   // if current was selected - select it as ON TOP
+//            if(!card.isSelectedOnTop()) {
+//                for (played in playerCards!!) {
+//                    if (played.isSelectedOnTop()) {
+//                        played.resetSelected()
+//                        played.setSelected()
+//                    }
+//                }
+//                card.resetSelected()
+//                card.setSelectedOnTop()
+//                Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
+//            }
+//        } else if(selectedCards.selectionValue == card.getCardValue()){
+//            for(played in playerCards!!){
+//                if(played.isSelectedOnTop()){
+//                    played.resetSelected()
+//                    played.setSelected()
+//                }
+//            }
+//            card.resetSelected()
+//            card.setSelectedOnTop()
+//            selectedCards.list.add(position)
+//            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
+//
+//            if(card.getCardValue() == cardManager.displayedCard.getCardValue())
+//                selectedCards.selectionType = SelectedCardsStruct.SelectionType.value
+//            else
+//                selectedCards.selectionType = SelectedCardsStruct.SelectionType.house
+//        } else{
+//            wrongCardAlertDialog()
+//        }
 
-        // TODO: Instead of Snackbar -> Toast.LONG
-
-        if(selectedCards.list.size == selectedCards.MAX_SELECTED){
-            notifyMaxCardsSelected()
-        }
-        else if(selectedCards.list.isEmpty()){                   // if there are no cards selected
-            card.resetSelected()
-            card.setSelectedOnTop()
-            selectedCards.list.add(position)
-            selectedCards.selectionType = SelectedCardsStruct.SelectionType.one
-            selectedCards.selectionValue = card.getCardValue()
-            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
-        } else if(selectedCards.list.contains(position)){   // if current was selected - select it as ON TOP
-            if(!card.isSelectedOnTop()) {
-                for (played in playerCards!!) {
-                    if (played.isSelectedOnTop()) {
-                        played.resetSelected()
-                        played.setSelected()
-                    }
-                }
-                card.resetSelected()
-                card.setSelectedOnTop()
-                Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
-            }
-        } else if(selectedCards.selectionValue == card.getCardValue()){
-            for(played in playerCards!!){
-                if(played.isSelectedOnTop()){
-                    played.resetSelected()
-                    played.setSelected()
-                }
-            }
-            card.resetSelected()
-            card.setSelectedOnTop()
-            selectedCards.list.add(position)
-            Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
-
-            if(card.getCardValue() == cardManager.displayedCard.getCardValue())
-                selectedCards.selectionType = SelectedCardsStruct.SelectionType.value
-            else
-                selectedCards.selectionType = SelectedCardsStruct.SelectionType.house
-        } else{
-            wrongCardAlertDialog()
-        }
+        players[0].selectedCardLong(position)
 
         playCardsButtonUpdate()
         cardAdapter!!.notifyDataSetChanged()
@@ -212,8 +227,8 @@ class FirstFragment : Fragment(), CardListListener {
     private fun drawNewCard() {
 
         // while new cards are drawed, the state of current cards is reset
-        for(card in playerCards!!) card.resetSelected()
-        resetSelectedCards()
+        for(card in players[0].playerCards) card.resetSelected()
+        players[0].resetSelectedCards()
 
 
         var quantityToGet: Int
@@ -227,7 +242,7 @@ class FirstFragment : Fragment(), CardListListener {
         for(it in 1..quantityToGet) {
             if(cardManager.shuffleUsedCards()) {            // if there are cards available
                 var randomizedCard: CardItem = cardManager.drawFromFreeCards()
-                playerCards!!.add(randomizedCard)
+                players[0].playerCards.add(randomizedCard)
 
                 //update cardAdapter
                 cardManager.currentFreeCards.remove(randomizedCard)
@@ -244,117 +259,87 @@ class FirstFragment : Fragment(), CardListListener {
 
     private fun playCards(){
 
-        if(selectedCards.list.size == 1){
-            var card = playerCards!![selectedCards.list.get(0)]
-            if(cardManager.displayedCard.getCardValue() == card.getCardValue()
-                ||  cardManager.displayedCard.getCardType() == card.getCardType()){
-                managePlayingCards()
-            } else{
-                wrongCardAlertDialog()
-            }
-        } else if(selectedCards.selectionType == SelectedCardsStruct.SelectionType.value){
-            // if selected cards has the same value as displayed card - i.e. stacking the same value
-            managePlayingCards()
-        } else if(selectedCards.selectionType == SelectedCardsStruct.SelectionType.house){
-            // if selected cards base on the house type of the displayed card
-            var matchesHouseType: Boolean = false
-            var wrongOnTop: Boolean = false
-
-            for(it in selectedCards.list){
-                if(playerCards!![it].getCardType() ==  cardManager.displayedCard.getCardType())
-                    matchesHouseType = true
-                if(playerCards!![it].isSelectedOnTop()){
-                    if(playerCards!![it].getCardType() ==  cardManager.displayedCard.getCardType()){
-                        wrongOnTop = true
-                        break
-                    }
-                }
-            }
-
-            if(wrongOnTop || !matchesHouseType){
-                wrongCardAlertDialog(wrongOnTop, matchesHouseType)
-            } else{
-                managePlayingCards()
-            }
-        }
+//        if(selectedCards.list.size == 1){
+//            var card = playerCards!![selectedCards.list.get(0)]
+//            if(cardManager.displayedCard.getCardValue() == card.getCardValue()
+//                ||  cardManager.displayedCard.getCardType() == card.getCardType()){
+//                managePlayingCards()
+//            } else{
+//                wrongCardAlertDialog()
+//            }
+//        } else if(selectedCards.selectionType == SelectedCardsStruct.SelectionType.value){
+//            // if selected cards has the same value as displayed card - i.e. stacking the same value
+//            managePlayingCards()
+//        } else if(selectedCards.selectionType == SelectedCardsStruct.SelectionType.house){
+//            // if selected cards base on the house type of the displayed card
+//            var matchesHouseType: Boolean = false
+//            var wrongOnTop: Boolean = false
+//
+//            for(it in selectedCards.list){
+//                if(playerCards!![it].getCardType() ==  cardManager.displayedCard.getCardType())
+//                    matchesHouseType = true
+//                if(playerCards!![it].isSelectedOnTop()){
+//                    if(playerCards!![it].getCardType() ==  cardManager.displayedCard.getCardType()){
+//                        wrongOnTop = true
+//                        break
+//                    }
+//                }
+//            }
+//
+//            if(wrongOnTop || !matchesHouseType){
+//                wrongCardAlertDialog(wrongOnTop, matchesHouseType)
+//            } else{
+//                managePlayingCards()
+//            }
+//        }
     }
 
     // TODO: przerzucić może do klasy CardManager (?)
     // INFO: DONE - probably
     private fun managePlayingCards(){
-        var cardsChosen = ArrayList<CardItem>()
+//        var cardsChosen = ArrayList<CardItem>()
+//
+//        for(it in selectedCards.list){
+//            cardsChosen.add(playerCards!![it])
+//        }
+//
+//        // set card ON TOP as a  cardManager.displayedCard
+//        for(card in cardsChosen){
+//            if(card.isSelectedOnTop()){
+//                cardManager.usedPlayingCards.add(cardManager.displayedCard)
+//                card.resetSelected()
+//                 cardManager.displayedCard = card
+//                binding.displayedCard.setImageResource(cardManager.displayedCard.getCardId())
+//                playerCards!!.remove(card)
+//                cardsChosen.remove(card)
+//                break
+//            }
+//        }
+//
+//        // for rest of the cards
+//        for(card in cardsChosen){
+//            card.resetSelected()
+//            cardManager.usedPlayingCards.add(card)
+//            playerCards!!.remove(card)
+//        }
+//
+//        if(selectedCards.list.size == 1)
+//            Toast.makeText(requireContext(), "You played ${selectedCards.list.size} card!", Toast.LENGTH_SHORT).show()
+//        else
+//            Toast.makeText(requireContext(), "You played ${selectedCards.list.size} cards!", Toast.LENGTH_SHORT).show()
 
-        for(it in selectedCards.list){
-            cardsChosen.add(playerCards!![it])
-        }
+        cardManager.managePlayingCards(players[0].selectedCards.list, players[0].playerCards, binding.displayedCard, binding.currentCardName!!)
 
-        // set card ON TOP as a  cardManager.displayedCard
-        for(card in cardsChosen){
-            if(card.isSelectedOnTop()){
-                cardManager.usedPlayingCards.add(cardManager.displayedCard)
-                card.resetSelected()
-                 cardManager.displayedCard = card
-                binding.displayedCard.setImageResource(cardManager.displayedCard.getCardId())
-                playerCards!!.remove(card)
-                cardsChosen.remove(card)
-                break
-            }
-        }
-
-        // for rest of the cards
-        for(card in cardsChosen){
-            card.resetSelected()
-            cardManager.usedPlayingCards.add(card)
-            playerCards!!.remove(card)
-        }
-
-        if(selectedCards.list.size == 1)
-            Toast.makeText(requireContext(), "You played ${selectedCards.list.size} card!", Toast.LENGTH_SHORT).show()
-        else
-            Toast.makeText(requireContext(), "You played ${selectedCards.list.size} cards!", Toast.LENGTH_SHORT).show()
-
-        resetSelectedCards()
+        players[0].resetSelectedCards()
         updatePlayerInfo()
-        cardManager.setCurrentCardInfo(binding.currentCardName!!)
+        //cardManager.setCurrentCardInfo(binding.currentCardName!!)
         cardAdapter!!.notifyDataSetChanged()
-
-        //==============================================
-        // from previous commits
-
-        /*if(cardGameLogic(cardItem,  cardManager.displayedCard)) {
-            // delete card from visible list
-            arrayList!!.remove(cardItem)
-            // INFO: when a card is chosen, current card on-deck goes to the available cards...
-            if (!(displayedCard.getCardType() == HouseType.none &&  cardManager.displayedCard.getCardValue() == CardValue.none)) {
-                usedPlayingCards!!.add(displayedCard)
-            }
-             cardManager.displayedCard = cardItem
-            cardItem.getCardId()?.let { binding.displayedCard.setImageResource(it) }
-            // INFO: changing card quantity
-            freeCardsQuantity++
-            binding.currentFreeCards.text = freeCardsQuantity.toString()
-            // TO_DELETE: INFO: changing card quantity
-            //freeCardsQuantity++
-            //binding.currentFreeCards.text = freeCardsQuantity.toString()
-            Toast.makeText(requireContext(), "Card was played!", Toast.LENGTH_SHORT).show()
-            // change current card info
-            setCurrentCardInfo()
-            Log.i("PLACE", "before penalty check")
-            penaltyCheckerAlertDialog(displayedCard, arrayList!!)
-            // at the end: reset displayed data
-            cardAdapter!!.notifyDataSetChanged()
-        } else{
-            wrongCardAlertDialog(displayedCard)
-            //Snackbar.make(view, "Card cannot be played!", Snackbar.LENGTH_SHORT).show()
-            Toast.makeText(requireContext(), "Card cannot be played!", Toast.LENGTH_SHORT).show()
-        }
-        }*/
     }
 
 
     /** change "Play a card" button state **/
     private fun playCardsButtonUpdate(){
-        when(selectedCards.list.size){
+        when(players[0].selectedCards.list.size){
             0 -> {
                 binding.playCardbutton!!.isEnabled = false
                 binding.playCardbutton!!.text = "Play a card"}
@@ -362,7 +347,7 @@ class FirstFragment : Fragment(), CardListListener {
                 binding.playCardbutton!!.isEnabled = true
                 binding.playCardbutton!!.text = "Play a card"}
             2 -> {
-                if(selectedCards.twosPlaying())
+                if(players[0].selectedCards.twosPlaying())
                     binding.playCardbutton!!.text = "Play 2 cards"
                 else
                     binding.playCardbutton!!.isEnabled = false }
@@ -404,39 +389,39 @@ class FirstFragment : Fragment(), CardListListener {
         return false
     }
 
-    private fun wrongCardAlertDialog(wrongOnTop: Boolean = false, matchesHouseType: Boolean = false){
-        val alert = AlertDialog.Builder(requireContext())
-        var cardOnStack =  cardManager.displayedCard
+//    private fun wrongCardAlertDialog(wrongOnTop: Boolean = false, matchesHouseType: Boolean = false){
+//        val alert = AlertDialog.Builder(requireContext())
+//        var cardOnStack =  cardManager.displayedCard
+//
+//        if(wrongOnTop && matchesHouseType){
+//            alert.setMessage("Wrong card was chosen to display!")
+//            alert.setPositiveButton(
+//                "Choose the other card"
+//            ){ dialogInterface, i -> /* player will choose new card by himself */ }
+//        } else if(wrongOnTop && !matchesHouseType){
+//            alert.setMessage("This set of cards cannot be played! You need to select 1 card of ${cardOnStack.getCardType()}.")
+//            alert.setPositiveButton(
+//                "Choose the other card"
+//            ) { dialogInterface, i -> /* player will choose new card by himself */}
+//        } else {
+//            alert.setMessage("This card can't be played!\nTry ${cardOnStack.getCardValueName()}s or ${cardOnStack.getCardType()}")
+//            alert.setPositiveButton(
+//                "OK"
+//            ) { dialogInterface, i ->
+//                // What to do after clicking "positive" button
+//            }
+//        }
+//        alert.create().show()
+//    }
 
-        if(wrongOnTop && matchesHouseType){
-            alert.setMessage("Wrong card was chosen to display!")
-            alert.setPositiveButton(
-                "Choose the other card"
-            ){ dialogInterface, i -> /* player will choose new card by himself */ }
-        } else if(wrongOnTop && !matchesHouseType){
-            alert.setMessage("This set of cards cannot be played! You need to select 1 card of ${cardOnStack.getCardType()}.")
-            alert.setPositiveButton(
-                "Choose the other card"
-            ) { dialogInterface, i -> /* player will choose new card by himself */}
-        } else {
-            alert.setMessage("This card can't be played!\nTry ${cardOnStack.getCardValueName()}s or ${cardOnStack.getCardType()}")
-            alert.setPositiveButton(
-                "OK"
-            ) { dialogInterface, i ->
-                // What to do after clicking "positive" button
-            }
-        }
-        alert.create().show()
-    }
-
-    private fun notifyMaxCardsSelected(){
-        val alert = AlertDialog.Builder(requireContext())
-        alert.setMessage("Maximum number (4) of cards was selected!")
-        alert.setPositiveButton(
-            "OK"
-        ){ dialogInterface, i -> }
-        alert.create().show()
-    }
+//    private fun notifyMaxCardsSelected(){
+//        val alert = AlertDialog.Builder(requireContext())
+//        alert.setMessage("Maximum number (4) of cards was selected!")
+//        alert.setPositiveButton(
+//            "OK"
+//        ){ dialogInterface, i -> }
+//        alert.create().show()
+//    }
 
     ///////////////////////////////////
     // TODO: PENALTIES
@@ -480,15 +465,15 @@ class FirstFragment : Fragment(), CardListListener {
     ////////////////////////////////////////////////
     // OTHER updating functions
 
-    private fun resetSelectedCards(){
-        selectedCards.list.clear()
-        selectedCards.selectionType = SelectedCardsStruct.SelectionType.one
-        selectedCards.selectionValue = CardValue.none
-    }
+//    private fun resetSelectedCards(){
+//        selectedCards.list.clear()
+//        selectedCards.selectionType = SelectedCardsStruct.SelectionType.one
+//        selectedCards.selectionValue = CardValue.none
+//    }
 
     private fun updatePlayerInfo(){
         when(thisPlayerNum){
-            1 -> binding.player1CardsInfo!!.text = playerCards!!.size.toString()
+            1 -> binding.player1CardsInfo!!.text = players[0].playerCards.size.toString()
             else -> Log.i("PLAYER_ERROR", "There is no such player!")
         }
     }

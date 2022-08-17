@@ -1,4 +1,4 @@
-package com.example.cardshowcase.cardshandling
+package com.example.cardshowcase.cardsHandling
 
 enum class HouseType{
     // none, kier, diamonds, trefl, spades, joker
