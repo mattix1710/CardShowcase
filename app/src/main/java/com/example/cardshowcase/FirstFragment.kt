@@ -12,69 +12,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cardshowcase.cardshandling.*
 import com.example.cardshowcase.databinding.FragmentFirstBinding
+import com.example.cardshowcase.players.Player
 import com.google.android.flexbox.*
 import com.google.android.material.snackbar.Snackbar
 
 
-//INFO: ignore red marks on certain cards... everything is alright
-val cardsIds = arrayOf<Int>(
-    R.drawable.card_hearts_a,
-    R.drawable.card_hearts_02,
-    R.drawable.card_hearts_03,
-    R.drawable.card_hearts_04,
-    R.drawable.card_hearts_05,
-    R.drawable.card_hearts_06,
-    R.drawable.card_hearts_07,
-    R.drawable.card_hearts_08,
-    R.drawable.card_hearts_09,
-    R.drawable.card_hearts_10,
-    R.drawable.card_hearts_j,
-    R.drawable.card_hearts_q,
-    R.drawable.card_hearts_k,
-    //R.drawable.card_empty,
-    R.drawable.card_diamonds_a,
-    R.drawable.card_diamonds_02,
-    R.drawable.card_diamonds_03,
-    R.drawable.card_diamonds_04,
-    R.drawable.card_diamonds_05,
-    R.drawable.card_diamonds_06,
-    R.drawable.card_diamonds_07,
-    R.drawable.card_diamonds_08,
-    R.drawable.card_diamonds_09,
-    R.drawable.card_diamonds_10,
-    R.drawable.card_diamonds_j,
-    R.drawable.card_diamonds_q,
-    R.drawable.card_diamonds_k,
-    //R.drawable.card_back,
-    R.drawable.card_clubs_a,
-    R.drawable.card_clubs_02,
-    R.drawable.card_clubs_03,
-    R.drawable.card_clubs_04,
-    R.drawable.card_clubs_05,
-    R.drawable.card_clubs_06,
-    R.drawable.card_clubs_07,
-    R.drawable.card_clubs_08,
-    R.drawable.card_clubs_09,
-    R.drawable.card_clubs_10,
-    R.drawable.card_clubs_j,
-    R.drawable.card_clubs_q,
-    R.drawable.card_clubs_k,
-    R.drawable.card_joker_red,
-    R.drawable.card_spades_a,
-    R.drawable.card_spades_02,
-    R.drawable.card_spades_03,
-    R.drawable.card_spades_04,
-    R.drawable.card_spades_05,
-    R.drawable.card_spades_06,
-    R.drawable.card_spades_07,
-    R.drawable.card_spades_08,
-    R.drawable.card_spades_09,
-    R.drawable.card_spades_10,
-    R.drawable.card_spades_j,
-    R.drawable.card_spades_q,
-    R.drawable.card_spades_k,
-    R.drawable.card_joker_black
-)
+
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -86,11 +29,7 @@ class FirstFragment : Fragment(), CardListListener {
     //////////////////////////////////////////////
     // card info among the players
     //
-    private var allPlayingCards = ArrayList<CardItem>()
-    private var currentFreeCards = ArrayList<CardItem>()
-    private var usedPlayingCards = ArrayList<CardItem>()
-    private var displayedCard: CardItem = CardItem(R.drawable.card_empty)
-    private var freeCardsQuantity: Int = 0
+    private lateinit var cardManager: CardManager
     private var penalty: Int = 0
     //
     //////////////////////////////////////////////
@@ -103,6 +42,7 @@ class FirstFragment : Fragment(), CardListListener {
     // private player card info
     //
     private val thisPlayerNum: Int = 1
+    private var players = ArrayList<Player>()
     private var playerCards: ArrayList<CardItem> ? = null
 
     class SelectedCardsStruct{
@@ -121,7 +61,7 @@ class FirstFragment : Fragment(), CardListListener {
         }
     }
     private var selectedCards = SelectedCardsStruct()            // list of selected cards positions
-    private var cardAdapter:CardAdapter ? = null
+    private var cardAdapter: CardAdapter? = null
     //
     //////////////////////////////////////////////
 
@@ -132,8 +72,6 @@ class FirstFragment : Fragment(), CardListListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // TODO: zabezpieczyć przed resetowanie podczas obracania ekranu
-        // TODO: + utworzyć layout dla horyzontalnej pozycji
 
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
@@ -144,7 +82,7 @@ class FirstFragment : Fragment(), CardListListener {
         super.onViewCreated(view, savedInstanceState)
 
         // set initial resources
-        displayedCard.getCardId()?.let { binding.displayedCard.setImageResource(it) }
+        cardManager = CardManager(requireContext())
 
         binding.buttonFirst.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_MainFragment)
@@ -155,14 +93,8 @@ class FirstFragment : Fragment(), CardListListener {
         binding.playCardbutton!!.setOnClickListener{ playCards() }
         playCardsButtonUpdate()
 
-        //////////////////////////////////////
-        // for recyclerView
-        populateCardDeck()
-        allPlayingCards = currentFreeCards
-        freeCardsQuantity = currentFreeCards.size
-
         // draw cards to players hand (view)
-        playerCards = randomizeCardList()
+        playerCards = cardManager.randomizeCardList()
         cardAdapter = CardAdapter(playerCards!!, this@FirstFragment, requireContext())
 
         recyclerView = binding.cardListView
@@ -177,13 +109,8 @@ class FirstFragment : Fragment(), CardListListener {
 
         recyclerView!!.layoutManager = layoutManager
 
-        //////////////////////////////////////
-
         //draw a card for beginning a game
-        displayedCard = currentFreeCards.get((0 until currentFreeCards.size).random())
-        displayedCard.getCardId()?.let { binding.displayedCard.setImageResource(it) }
-        currentFreeCards.remove(displayedCard)
-        setCurrentCardInfo(wasFirst = true)
+        cardManager?.setInitialDisplayedCard(binding.displayedCard, binding.currentCardName!!)
     }
 
     //////////////////////// onItemClick ///////////////////////
@@ -219,7 +146,7 @@ class FirstFragment : Fragment(), CardListListener {
             selectedCards.list.add(position)
             Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} was selected!", Snackbar.LENGTH_SHORT).show()
 
-            if(card.getCardValue() == displayedCard.getCardValue())
+            if(card.getCardValue() ==  cardManager.displayedCard.getCardValue())
                 selectedCards.selectionType = SelectedCardsStruct.SelectionType.value
             else
                 selectedCards.selectionType = SelectedCardsStruct.SelectionType.house
@@ -270,7 +197,7 @@ class FirstFragment : Fragment(), CardListListener {
             selectedCards.list.add(position)
             Snackbar.make(view, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Snackbar.LENGTH_SHORT).show()
 
-            if(card.getCardValue() == displayedCard.getCardValue())
+            if(card.getCardValue() == cardManager.displayedCard.getCardValue())
                 selectedCards.selectionType = SelectedCardsStruct.SelectionType.value
             else
                 selectedCards.selectionType = SelectedCardsStruct.SelectionType.house
@@ -280,82 +207,6 @@ class FirstFragment : Fragment(), CardListListener {
 
         playCardsButtonUpdate()
         cardAdapter!!.notifyDataSetChanged()
-    }
-
-    // wasFirst - variable indicating that it was the card played at the beginning of the game
-    private fun setCurrentCardInfo(wasFirst: Boolean = false) {
-        var value: String = displayedCard.getCardValueName()
-        var house: String = displayedCard.getCardType().toString()
-
-        if(displayedCard.getCardValue() == CardValue.two && !wasFirst)
-            binding.currentCardName!!.setTextColor(resources.getColor(R.color.current_card_functional_info))
-        else
-            binding.currentCardName!!.setTextColor(resources.getColor(R.color.current_card_info))
-
-        binding.currentCardName!!.text = "$value of $house"
-    }
-
-    private fun populateCardDeck() {
-
-        // TREFLE
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_02, HouseType.Clubs, CardValue.two))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_03, HouseType.Clubs, CardValue.three))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_04, HouseType.Clubs, CardValue.four))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_05, HouseType.Clubs, CardValue.five))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_06, HouseType.Clubs, CardValue.six))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_07, HouseType.Clubs, CardValue.seven))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_08, HouseType.Clubs, CardValue.eight))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_09, HouseType.Clubs, CardValue.nine))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_10, HouseType.Clubs, CardValue.ten))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_j, HouseType.Clubs, CardValue.jack))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_q, HouseType.Clubs, CardValue.queen))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_k, HouseType.Clubs, CardValue.king))
-        currentFreeCards.add(CardItem(R.drawable.card_clubs_a, HouseType.Clubs, CardValue.ace))
-        // diamonds
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_02, HouseType.Diamonds, CardValue.two))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_03, HouseType.Diamonds, CardValue.three))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_04, HouseType.Diamonds, CardValue.four))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_05, HouseType.Diamonds, CardValue.five))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_06, HouseType.Diamonds, CardValue.six))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_07, HouseType.Diamonds, CardValue.seven))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_08, HouseType.Diamonds, CardValue.eight))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_09, HouseType.Diamonds, CardValue.nine))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_10, HouseType.Diamonds, CardValue.ten))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_j, HouseType.Diamonds, CardValue.jack))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_q, HouseType.Diamonds, CardValue.queen))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_k, HouseType.Diamonds, CardValue.king))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_a, HouseType.Diamonds, CardValue.ace))
-        // spadesI
-        currentFreeCards.add(CardItem(R.drawable.card_spades_02, HouseType.Spades, CardValue.two))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_03, HouseType.Spades, CardValue.three))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_04, HouseType.Spades, CardValue.four))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_05, HouseType.Spades, CardValue.five))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_06, HouseType.Spades, CardValue.six))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_07, HouseType.Spades, CardValue.seven))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_08, HouseType.Spades, CardValue.eight))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_09, HouseType.Spades, CardValue.nine))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_10, HouseType.Spades, CardValue.ten))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_j, HouseType.Spades, CardValue.jack))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_q, HouseType.Spades, CardValue.queen))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_k, HouseType.Spades, CardValue.king))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_a, HouseType.Spades, CardValue.ace))
-        // KIERY
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_02, HouseType.Hearts, CardValue.two))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_03, HouseType.Hearts, CardValue.three))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_04, HouseType.Hearts, CardValue.four))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_05, HouseType.Hearts, CardValue.five))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_06, HouseType.Hearts, CardValue.six))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_07, HouseType.Hearts, CardValue.seven))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_08, HouseType.Hearts, CardValue.eight))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_09, HouseType.Hearts, CardValue.nine))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_10, HouseType.Hearts, CardValue.ten))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_j, HouseType.Hearts, CardValue.jack))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_q, HouseType.Hearts, CardValue.queen))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_k, HouseType.Hearts, CardValue.king))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_a, HouseType.Hearts, CardValue.ace))
-        // JOKERY
-        currentFreeCards.add(CardItem(R.drawable.card_joker_black, HouseType.Joker, CardValue.red))
-        currentFreeCards.add(CardItem(R.drawable.card_joker_red, HouseType.Joker, CardValue.black))
     }
 
     private fun drawNewCard() {
@@ -370,21 +221,21 @@ class FirstFragment : Fragment(), CardListListener {
             quantityToGet = 1
         else {
             quantityToGet = penalty
-            displayedCard.setCardPlayed()
+            cardManager.displayedCard.setCardPlayed()
         }
 
         for(it in 1..quantityToGet) {
-            if(shuffleUsedCards()) {            // if there are cards available
-                var randomizedCard: CardItem =
-                    currentFreeCards.get((0 until currentFreeCards.size).random())
+            if(cardManager.shuffleUsedCards()) {            // if there are cards available
+                var randomizedCard: CardItem = cardManager.drawFromFreeCards()
                 playerCards!!.add(randomizedCard)
 
                 //update cardAdapter
-                freeCardsQuantity--
-                binding.currentFreeCards.text = freeCardsQuantity.toString()
-                currentFreeCards.remove(randomizedCard)
+                cardManager.currentFreeCards.remove(randomizedCard)
             }
         }
+
+        Log.i("FREE CARDS", cardManager.currentFreeCards.size.toString())
+        Log.i("USED CARDS", cardManager.usedPlayingCards.size.toString())
 
         // update the view
         updatePlayerInfo()
@@ -395,8 +246,8 @@ class FirstFragment : Fragment(), CardListListener {
 
         if(selectedCards.list.size == 1){
             var card = playerCards!![selectedCards.list.get(0)]
-            if(displayedCard.getCardValue() == card.getCardValue()
-                || displayedCard.getCardType() == card.getCardType()){
+            if(cardManager.displayedCard.getCardValue() == card.getCardValue()
+                ||  cardManager.displayedCard.getCardType() == card.getCardType()){
                 managePlayingCards()
             } else{
                 wrongCardAlertDialog()
@@ -410,10 +261,10 @@ class FirstFragment : Fragment(), CardListListener {
             var wrongOnTop: Boolean = false
 
             for(it in selectedCards.list){
-                if(playerCards!![it].getCardType() == displayedCard.getCardType())
+                if(playerCards!![it].getCardType() ==  cardManager.displayedCard.getCardType())
                     matchesHouseType = true
                 if(playerCards!![it].isSelectedOnTop()){
-                    if(playerCards!![it].getCardType() == displayedCard.getCardType()){
+                    if(playerCards!![it].getCardType() ==  cardManager.displayedCard.getCardType()){
                         wrongOnTop = true
                         break
                     }
@@ -428,6 +279,7 @@ class FirstFragment : Fragment(), CardListListener {
         }
     }
 
+    // TODO: przerzucić może do klasy CardManager (?)
     // INFO: DONE - probably
     private fun managePlayingCards(){
         var cardsChosen = ArrayList<CardItem>()
@@ -436,13 +288,13 @@ class FirstFragment : Fragment(), CardListListener {
             cardsChosen.add(playerCards!![it])
         }
 
-        // set card ON TOP as a displayedCard
+        // set card ON TOP as a  cardManager.displayedCard
         for(card in cardsChosen){
             if(card.isSelectedOnTop()){
-                usedPlayingCards.add(displayedCard)
+                cardManager.usedPlayingCards.add(cardManager.displayedCard)
                 card.resetSelected()
-                displayedCard = card
-                binding.displayedCard.setImageResource(displayedCard.getCardId())
+                 cardManager.displayedCard = card
+                binding.displayedCard.setImageResource(cardManager.displayedCard.getCardId())
                 playerCards!!.remove(card)
                 cardsChosen.remove(card)
                 break
@@ -452,7 +304,7 @@ class FirstFragment : Fragment(), CardListListener {
         // for rest of the cards
         for(card in cardsChosen){
             card.resetSelected()
-            usedPlayingCards.add(card)
+            cardManager.usedPlayingCards.add(card)
             playerCards!!.remove(card)
         }
 
@@ -463,19 +315,20 @@ class FirstFragment : Fragment(), CardListListener {
 
         resetSelectedCards()
         updatePlayerInfo()
+        cardManager.setCurrentCardInfo(binding.currentCardName!!)
         cardAdapter!!.notifyDataSetChanged()
 
         //==============================================
         // from previous commits
 
-        /*if(cardGameLogic(cardItem, displayedCard)) {
+        /*if(cardGameLogic(cardItem,  cardManager.displayedCard)) {
             // delete card from visible list
             arrayList!!.remove(cardItem)
             // INFO: when a card is chosen, current card on-deck goes to the available cards...
-            if (!(displayedCard.getCardType() == HouseType.none && displayedCard.getCardValue() == CardValue.none)) {
+            if (!(displayedCard.getCardType() == HouseType.none &&  cardManager.displayedCard.getCardValue() == CardValue.none)) {
                 usedPlayingCards!!.add(displayedCard)
             }
-            displayedCard = cardItem
+             cardManager.displayedCard = cardItem
             cardItem.getCardId()?.let { binding.displayedCard.setImageResource(it) }
             // INFO: changing card quantity
             freeCardsQuantity++
@@ -528,36 +381,6 @@ class FirstFragment : Fragment(), CardListListener {
         binding.playCardbutton!!.isEnabled = false
     }
 
-    private fun shuffleUsedCards(): Boolean{
-        if(currentFreeCards.isEmpty()){
-            //if all the cards have players
-            if(usedPlayingCards.isEmpty()){
-                Toast.makeText(requireContext(), "There are no cards left to draw!", Toast.LENGTH_SHORT).show()
-                return false
-            }
-            //if there are some leftover cards on the stack - place them into non-used cards stack
-            for(it in usedPlayingCards) currentFreeCards.add(it)
-            usedPlayingCards.clear()
-        }
-
-        return true
-    }
-
-    private fun randomizeCardList(): ArrayList<CardItem>{
-        var arrayList: ArrayList<CardItem> = ArrayList()
-
-        for(i in 1..5){
-            var randomizedCard: CardItem = currentFreeCards.get((0 until currentFreeCards.size).random())
-            arrayList.add(randomizedCard)
-            currentFreeCards.remove(randomizedCard)
-
-            // INFO: changing card quantity
-            freeCardsQuantity--
-            binding.currentFreeCards.text = freeCardsQuantity.toString()
-        }
-        return arrayList
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -583,7 +406,7 @@ class FirstFragment : Fragment(), CardListListener {
 
     private fun wrongCardAlertDialog(wrongOnTop: Boolean = false, matchesHouseType: Boolean = false){
         val alert = AlertDialog.Builder(requireContext())
-        var cardOnStack = displayedCard
+        var cardOnStack =  cardManager.displayedCard
 
         if(wrongOnTop && matchesHouseType){
             alert.setMessage("Wrong card was chosen to display!")
@@ -624,7 +447,7 @@ class FirstFragment : Fragment(), CardListListener {
 
         // check for 2s
         if(cardOnStack.wasCardPlayed()){
-            displayedCard.resetCardPlayed()
+             cardManager.displayedCard.resetCardPlayed()
             binding.drawCardButton!!.text = "Draw a card"
             penalty = 0
         }
