@@ -120,7 +120,6 @@ class CardManager(val context: Context){
             Toast.makeText(context, "You played ${selectedCards.size} cards!", Toast.LENGTH_SHORT).show()
 
         setCurrentCardInfo(displayedInfo)
-
     }
 
     fun drawCardFromStack(playerCards: ArrayList<CardItem>,

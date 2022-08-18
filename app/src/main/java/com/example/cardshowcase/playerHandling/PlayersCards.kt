@@ -2,6 +2,9 @@ package com.example.cardshowcase.playerHandling
 
 import android.app.AlertDialog
 import android.content.Context
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.example.cardshowcase.cardsHandling.CardItem
 import com.example.cardshowcase.cardsHandling.CardManager
@@ -106,12 +109,43 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
         }
     }
 
-    fun playCards(){
+    // TODO: playCards - złączyć playCards() i managePlayingCards()
+    fun playCards(displayedCard: ImageView, displayedCardInfo: TextView){
         if(selectedCards.list.size == 1){
             var card = playerCards[selectedCards.list[0]]
             if(cardManager.displayedCard.getCardValue() == card.getCardValue()
                 || cardManager.displayedCard.getCardType() == card.getCardType()){
-                //cardManager.managePlayingCards()
+                cardManager.managePlayingCards(selectedCards.list, playerCards,
+                    displayedCard, displayedCardInfo)
+                resetSelectedCards()
+            } else{
+                wrongCardAlertDialog()
+            }
+        } else if(selectedCards.selectionType == SelectedCardsStruct.SelectionType.value){
+            // if selected cards have the same value as displayed card - i.e. stacking the same value
+            cardManager.managePlayingCards(selectedCards.list, playerCards, displayedCard, displayedCardInfo)
+            resetSelectedCards()
+        } else if(selectedCards.selectionType == SelectedCardsStruct.SelectionType.house){
+            // if selected cards base on the house type of the displayed card
+            var matchesHouseType: Boolean = false
+            var wrongOnTop: Boolean = false
+
+            for(it in selectedCards.list){
+                if(playerCards[it].getCardType() == cardManager.displayedCard.getCardType())
+                    matchesHouseType = true
+                if(playerCards[it].isSelectedOnTop()){
+                    if (playerCards[it].getCardType() == cardManager.displayedCard.getCardType()){
+                        wrongOnTop = true
+                        break
+                    }
+                }
+            }
+
+            if(wrongOnTop || !matchesHouseType){
+                wrongCardAlertDialog(wrongOnTop, matchesHouseType)
+            } else{
+                cardManager.managePlayingCards(selectedCards.list, playerCards, displayedCard, displayedCardInfo)
+                resetSelectedCards()
             }
         }
     }
@@ -154,6 +188,33 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
             "OK"
         ){ dialogInterface, i -> }
         alert.create().show()
+    }
+
+    fun playCardsButtonUpdate(playCardButton: Button){
+        when(selectedCards.list.size){
+            0 -> {
+                playCardButton.isEnabled = false
+                playCardButton.text = "Play a card"}
+            1 -> {
+                playCardButton.isEnabled = true
+                playCardButton.text = "Play a card"}
+            2 -> {
+                if(selectedCards.twosPlaying())
+                    playCardButton.text = "Play 2 cards"
+                else
+                    playCardButton.isEnabled = false }
+            3 -> {
+                playCardButton.isEnabled = true
+                playCardButton.text = "Play 3 cards"}
+            4 -> {
+                playCardButton.isEnabled = true
+                playCardButton.text = "Play 4 cards"}
+            else -> tooManySelected(playCardButton)
+        }
+    }
+
+    private fun tooManySelected(playCardButton: Button){
+        playCardButton.isEnabled = false
     }
 
 }
