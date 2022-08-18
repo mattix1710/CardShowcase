@@ -48,18 +48,35 @@ class MainActivity : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> true
+            R.id.action_instructions -> displayInstructionsDialog()
             R.id.action_manual -> displayManualDialog()
             else -> super.onOptionsItemSelected(item)
         }
     }
 
+    // TODO: fill and set Instructions for the game
+    /** Displays the instructions for the Makao game **/
+    private fun displayInstructionsDialog(): Boolean {
+        var inflater = LayoutInflater.from(this)
+        var view = inflater.inflate(R.layout.instructions_dialog, null)
+
+        var instructionsDialog = AlertDialog.Builder(this)
+        instructionsDialog.setTitle("Makao instructions")
+        instructionsDialog.setView(view)
+        instructionsDialog.setPositiveButton("I understand", null)
+        instructionsDialog.create().show()
+
+        return true
+    }
+
     // TODO: fill and set proper manual view
+    /** Displays manual for using this app **/
     private fun displayManualDialog(): Boolean {
         var inflater = LayoutInflater.from(this)
         var view = inflater.inflate(R.layout.manual_dialog, null)
 
         var manualDialog = AlertDialog.Builder(this)
-        manualDialog.setTitle("Macao - MANUAL")
+        manualDialog.setTitle("App MANUAL")
         manualDialog.setView(view)
         manualDialog.setPositiveButton("I understand", null)
         manualDialog.create().show()

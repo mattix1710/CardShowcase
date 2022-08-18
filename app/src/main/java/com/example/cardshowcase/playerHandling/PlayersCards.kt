@@ -156,21 +156,13 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
 
         if(wrongOnTop && matchesHouseType){
             alert.setMessage("Wrong card was chosen to display!")
-            alert.setPositiveButton(
-                "Choose the other card"
-            ){ dialogInterface, i -> /* player will choose new card by himself */ }
+            alert.setPositiveButton("Choose the other card", null)
         } else if(wrongOnTop && !matchesHouseType){
             alert.setMessage("This set of cards cannot be played! You need to select 1 card of ${cardOnStack.getCardType()}.")
-            alert.setPositiveButton(
-                "Choose the other card"
-            ) { dialogInterface, i -> /* player will choose new card by himself */}
+            alert.setPositiveButton("Choose the other card", null)
         } else {
             alert.setMessage("This card can't be played!\nTry ${cardOnStack.getCardValueName()}s or ${cardOnStack.getCardType()}")
-            alert.setPositiveButton(
-                "OK"
-            ) { dialogInterface, i ->
-                // What to do after clicking "positive" button
-            }
+            alert.setPositiveButton("OK", null)
         }
         alert.create().show()
     }
@@ -184,9 +176,7 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
     private fun notifyMaxCardsSelected(){
         val alert = AlertDialog.Builder(context)
         alert.setMessage("Maximum number (4) of cards was selected!")
-        alert.setPositiveButton(
-            "OK"
-        ){ dialogInterface, i -> }
+        alert.setPositiveButton("OK", null)
         alert.create().show()
     }
 
