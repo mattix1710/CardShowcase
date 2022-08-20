@@ -1,3 +1,3 @@
-* In file "cards.zip/assets/.SHOWDOWN" there are shown different card styles with a number as its title indicating the folder, where given styleset is placed.
-* In file "cards.zip" there is a batch file "renameIt.bat" used for quick change of card name convention used in the app
-* In file "card_back_editor.zip" there are sample card backs and GIMP project for creating different styles and colours...
+* In file __<span style="color:yellow">cards.zip/assets/.SHOWDOWN</span>__ there are shown different card styles with a number as its title indicating the folder, where given styleset is placed.
+* In file __<span style="color:yellow">cards.zip</span>__ there is a batch file __<span style="color:orange">renameIt.bat</span>__ used for quick change of card name convention used in the app
+* In file __<span style="color:yellow">card_back_editor.zip</span>__ there are _sample card backs_ and _GIMP project_ for creating different styles and colours...
