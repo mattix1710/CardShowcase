@@ -6,12 +6,12 @@
     app:startDestination="@id/MainFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.example.cardshowcase.FirstFragment"
+        android:id="@+id/GameLocalMultiplayer"
+        android:name="com.example.cardshowcase.GameLocalMultiplayer"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        tools:layout="@layout/game_local_multiplayer">
         <action
-            android:id="@+id/action_FirstFragment_to_MainFragment"
+            android:id="@+id/action_GameLocalMultiplayer_to_MainFragment"
             app:destination="@id/MainFragment" />
     </fragment>
     <fragment
@@ -19,7 +19,7 @@
         android:name="com.example.cardshowcase.MainFragment"
         android:label="@string/main_fragment_label">
         <action
-            android:id="@+id/action_MainFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_MainFragment_to_GameLocalMultiplayer"
+            app:destination="@id/GameLocalMultiplayer" />
     </fragment>
 </navigation>

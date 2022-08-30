@@ -195,9 +195,9 @@ class CardManager(val context: Context){
         currentFreeCards.add(CardItem(R.drawable.card_hearts_q, HouseType.Hearts, CardValue.queen))
         currentFreeCards.add(CardItem(R.drawable.card_hearts_k, HouseType.Hearts, CardValue.king))
         currentFreeCards.add(CardItem(R.drawable.card_hearts_a, HouseType.Hearts, CardValue.ace))
-        // JOKERY
-        currentFreeCards.add(CardItem(R.drawable.card_joker_black, HouseType.Joker, CardValue.red))
-        currentFreeCards.add(CardItem(R.drawable.card_joker_red, HouseType.Joker, CardValue.black))
+//        // JOKERY
+//        currentFreeCards.add(CardItem(R.drawable.card_joker_black, HouseType.Joker, CardValue.red))
+//        currentFreeCards.add(CardItem(R.drawable.card_joker_red, HouseType.Joker, CardValue.black))
     }
 }
 
@@ -243,7 +243,7 @@ val cardsIds = arrayOf<Int>(
     R.drawable.card_clubs_j,
     R.drawable.card_clubs_q,
     R.drawable.card_clubs_k,
-    R.drawable.card_joker_red,
+    //R.drawable.card_joker_red,
     R.drawable.card_spades_a,
     R.drawable.card_spades_02,
     R.drawable.card_spades_03,
@@ -256,6 +256,6 @@ val cardsIds = arrayOf<Int>(
     R.drawable.card_spades_10,
     R.drawable.card_spades_j,
     R.drawable.card_spades_q,
-    R.drawable.card_spades_k,
-    R.drawable.card_joker_black
+    R.drawable.card_spades_k
+    //R.drawable.card_joker_black
 )

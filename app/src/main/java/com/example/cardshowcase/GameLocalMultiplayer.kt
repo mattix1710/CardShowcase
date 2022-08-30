@@ -1,29 +1,29 @@
 package com.example.cardshowcase
 
 import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cardshowcase.cardsHandling.*
-import com.example.cardshowcase.databinding.FragmentFirstBinding
+import com.example.cardshowcase.databinding.GameLocalMultiplayerBinding
 import com.example.cardshowcase.playerHandling.Player
 import com.google.android.flexbox.*
-import com.google.android.material.snackbar.Snackbar
-
-
+import org.w3c.dom.Text
 
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment(), CardListListener {
+class GameLocalMultiplayer : Fragment(), CardListListener {
 
-    private var _binding: FragmentFirstBinding? = null
+    private var _binding: GameLocalMultiplayerBinding? = null
 
     //////////////////////////////////////////////
     // card info among the players
@@ -40,7 +40,7 @@ class FirstFragment : Fragment(), CardListListener {
     //////////////////////////////////////////////
     // private player card info
     //
-    private val thisPlayerNum: Int = 1
+    private var currentPlayerNum: Int = 0
     private var players = ArrayList<Player>()
 
     private var cardAdapter: CardAdapter? = null
@@ -55,7 +55,7 @@ class FirstFragment : Fragment(), CardListListener {
         savedInstanceState: Bundle?
     ): View? {
 
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        _binding = GameLocalMultiplayerBinding.inflate(inflater, container, false)
         return binding.root
 
     }
@@ -67,7 +67,7 @@ class FirstFragment : Fragment(), CardListListener {
         cardManager = CardManager(requireContext())
 
         binding.buttonFirst.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_MainFragment)
+            findNavController().navigate(R.id.action_GameLocalMultiplayer_to_MainFragment)
         }
 
         players.add(Player("Player 1", 1, requireContext(), cardManager))
@@ -76,8 +76,8 @@ class FirstFragment : Fragment(), CardListListener {
         //playerCards = cardManager.randomizeCardList()
         players.get(0).initPlayerCards(cardManager.randomizeCardList())
 
-        //cardAdapter = CardAdapter(playerCards!!, this@FirstFragment, requireContext())
-        cardAdapter = CardAdapter(players[0].playerCards, this@FirstFragment, requireContext())
+        //cardAdapter = CardAdapter(playerCards!!, this@GameLocalMultiplayer, requireContext())
+        cardAdapter = CardAdapter(players[0].playerCards, this@GameLocalMultiplayer, requireContext())
 
         recyclerView = binding.cardListView
         recyclerView!!.adapter = cardAdapter
@@ -98,12 +98,31 @@ class FirstFragment : Fragment(), CardListListener {
             cardManager.drawCardFromStack(players[0].playerCards, cardAdapter!!)
             updatePlayerInfo()
         }
-        binding.drawCard.setOnClickListener { drawNewCard() }
+        binding.drawCard.setOnClickListener { newPlayerAlert() }//drawNewCard() }
         binding.playCardbutton!!.setOnClickListener{ playCards() }
         playCardsButtonUpdate()
 
         //draw a card for beginning a game
         cardManager?.setInitialDisplayedCard(binding.displayedCard, binding.currentCardName!!)
+    }
+
+    fun newPlayerAlert(){
+        // set new current player index number
+        currentPlayerNum = (currentPlayerNum + 1) % players.size
+
+        var inflater = LayoutInflater.from(requireContext())
+        // TODO: rethink the size of inflated message - too small to cover the other players cards
+        var view = inflater.inflate(R.layout.new_player_dialog, null)
+        //var currentPlayerInfo = findViewById(R.id.newPlayerInfo) as TextView
+
+        var newPlayerDialog = AlertDialog.Builder(requireContext())
+        newPlayerDialog.setTitle("A new player will play its turn")
+        newPlayerDialog.setView(view)
+        newPlayerDialog.setPositiveButton("I'm ready!",
+            DialogInterface.OnClickListener { dialogInterface, i ->
+                // TODO: display new current players cards
+            })
+        newPlayerDialog.create().show()
     }
 
     //////////////////////// onItemClick ///////////////////////
@@ -125,6 +144,7 @@ class FirstFragment : Fragment(), CardListListener {
         cardAdapter!!.notifyDataSetChanged()
     }
 
+    // TODO: delete??
     private fun drawNewCard() {
 
         // while new cards are drawed, the state of current cards is reset
@@ -236,7 +256,7 @@ class FirstFragment : Fragment(), CardListListener {
     // OTHER updating functions
 
     private fun updatePlayerInfo(){
-        when(thisPlayerNum){
+        when(currentPlayerNum){
             1 -> binding.player1CardsInfo!!.text = players[0].playerCards.size.toString()
             else -> Log.i("PLAYER_ERROR", "There is no such player!")
         }

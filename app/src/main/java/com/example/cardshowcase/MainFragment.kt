@@ -33,7 +33,7 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonPlay.setOnClickListener {
-            findNavController().navigate(R.id.action_MainFragment_to_FirstFragment)
+            findNavController().navigate(R.id.action_MainFragment_to_GameLocalMultiplayer)
         }
     }
 
