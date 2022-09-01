@@ -130,6 +130,10 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         if(!firstPlayer)
             currentPlayerNum = (currentPlayerNum + 1) % players.size        // player counting starts with 0
 
+        // set a curtain in front of the newly chosen cards - for the other players not to see cards
+        binding.onTopOfCardsGuard!!.background = resources.getDrawable(R.drawable.background_rectangle)
+        binding.onTopOfCardsGuard!!.bringToFront()
+
         cardAdapter = CardAdapter(players[currentPlayerNum].getCards(), this@GameLocalMultiplayer, requireContext())
         recyclerView!!.adapter = cardAdapter
 
@@ -148,6 +152,9 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                 // TODO: change view of new current players tile
                 updatePlayerInfo()
 
+                // dismiss curtain and set a cute border with gradient
+                binding.onTopOfCardsGuard!!.background = resources.getDrawable(R.drawable.empty_drawable)
+                binding.cardListView!!.bringToFront()
             })
         newPlayerDialog.create().show()
     }
