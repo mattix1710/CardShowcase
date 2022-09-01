@@ -67,7 +67,7 @@ class CardManager(val context: Context){
         return true
     }
 
-    fun randomizeCardList(): ArrayList<CardItem>{
+    fun randomizeInitCards(): ArrayList<CardItem>{
         var array: ArrayList<CardItem> = ArrayList()
 
         for(it in 1..5){

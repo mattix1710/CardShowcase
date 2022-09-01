@@ -11,21 +11,27 @@ import com.example.cardshowcase.cardsHandling.HouseType
  */
 class Player(playerName: String, playerNumber: Int, context: Context, cardManager: CardManager): PlayersCards(context, cardManager) {
     private var uniquePlayerID: Int = 123
-    var playerName: String = "Player"
-    var playerNumber: Int = 0
+    private var playerName: String = "Player"
+    private var playerNumber: Int = 0
+    private var playerCards = ArrayList<CardItem>()
 
     init {
         this.playerName = playerName
         this.playerNumber = playerNumber
         this.uniquePlayerID = (0..99999).random()
-    }
-
-    fun initPlayerCards(arrayList: ArrayList<CardItem>){
-        playerCards = arrayList
+        this.playerCards = cardManager.randomizeInitCards()
     }
 
     fun getPlayerID(): Int{
         return uniquePlayerID
+    }
+
+    fun getName(){
+        return playerName
+    }
+
+    fun getCards(){
+        return playerCards
     }
 
 }

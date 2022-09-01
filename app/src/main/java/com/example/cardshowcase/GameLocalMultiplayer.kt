@@ -70,14 +70,16 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
             findNavController().navigate(R.id.action_GameLocalMultiplayer_to_MainFragment)
         }
 
-        players.add(Player("Player 1", 1, requireContext(), cardManager))
+        // initialize players and draw cards to their hands
+        players.add(Player("Player 1", playerNumber = 1, requireContext(), cardManager))
+        players.add(Player("Player 2", playerNumber = 2, requireContext(), cardManager))
+        players.add(Player("Player 3", playerNumber = 3, requireContext(), cardManager))
+        players.add(Player("Player 4", playerNumber = 4, requireContext(). cardManager))
+        //players.get(0).initPlayerCards(cardManager.randomizeCardList())
 
-        // draw cards to players hand (view)
-        //playerCards = cardManager.randomizeCardList()
-        players.get(0).initPlayerCards(cardManager.randomizeCardList())
-
+        newPlayerAlert()
         //cardAdapter = CardAdapter(playerCards!!, this@GameLocalMultiplayer, requireContext())
-        cardAdapter = CardAdapter(players[0].playerCards, this@GameLocalMultiplayer, requireContext())
+        //cardAdapter = CardAdapter(players[0].playerCards, this@GameLocalMultiplayer, requireContext())
 
         recyclerView = binding.cardListView
         recyclerView!!.adapter = cardAdapter
@@ -108,7 +110,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
 
     fun newPlayerAlert(){
         // set new current player index number
-        currentPlayerNum = (currentPlayerNum + 1) % players.size
+        currentPlayerNum = (currentPlayerNum + 1) % players.size + 1    // player counting starts with 1
 
         var inflater = LayoutInflater.from(requireContext())
         // TODO: rethink the size of inflated message - too small to cover the other players cards
@@ -116,11 +118,14 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         //var currentPlayerInfo = findViewById(R.id.newPlayerInfo) as TextView
 
         var newPlayerDialog = AlertDialog.Builder(requireContext())
-        newPlayerDialog.setTitle("A new player will play its turn")
+        var title = players[currentPlayerNum].getName() + " will player its turn!"
+        newPlayerDialog.setTitle(title)
         newPlayerDialog.setView(view)
         newPlayerDialog.setPositiveButton("I'm ready!",
             DialogInterface.OnClickListener { dialogInterface, i ->
                 // TODO: display new current players cards
+                cardAdapter = CardAdapter(players[currentPlayerNum].getCards(), this@GameLocalMultiplayer, requireContext())
+                cardAdapter!!.notifyDataSetChanged()
             })
         newPlayerDialog.create().show()
     }
