@@ -27,8 +27,8 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
         }
     }
 
-    var selectedCards = SelectedCardsStruct()
-    var playerCards = ArrayList<CardItem>()
+    protected var selectedCards = SelectedCardsStruct()
+    protected var playerCards = ArrayList<CardItem>()
 
     fun selectedCard(position: Int){
         var card: CardItem = playerCards[position]          // REMEMBER: it's passed by reference
@@ -110,7 +110,9 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
     }
 
     // TODO: playCards - złączyć playCards() i managePlayingCards()
-    fun playCards(displayedCard: ImageView, displayedCardInfo: TextView){
+    fun playCards(displayedCard: ImageView, displayedCardInfo: TextView): Boolean{
+        var isGood: Boolean = false
+
         if(selectedCards.list.size == 1){
             var card = playerCards[selectedCards.list[0]]
             if(cardManager.displayedCard.getCardValue() == card.getCardValue()
@@ -118,13 +120,16 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
                 cardManager.managePlayingCards(selectedCards.list, playerCards,
                     displayedCard, displayedCardInfo)
                 resetSelectedCards()
+                isGood = true
             } else{
                 wrongCardAlertDialog()
+                isGood = false
             }
         } else if(selectedCards.selectionType == SelectedCardsStruct.SelectionType.value){
             // if selected cards have the same value as displayed card - i.e. stacking the same value
             cardManager.managePlayingCards(selectedCards.list, playerCards, displayedCard, displayedCardInfo)
             resetSelectedCards()
+            isGood = true
         } else if(selectedCards.selectionType == SelectedCardsStruct.SelectionType.house){
             // if selected cards base on the house type of the displayed card
             var matchesHouseType: Boolean = false
@@ -143,11 +148,15 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
 
             if(wrongOnTop || !matchesHouseType){
                 wrongCardAlertDialog(wrongOnTop, matchesHouseType)
+                isGood = false
             } else{
                 cardManager.managePlayingCards(selectedCards.list, playerCards, displayedCard, displayedCardInfo)
                 resetSelectedCards()
+                isGood = true
             }
         }
+
+        return isGood
     }
 
     private fun wrongCardAlertDialog(wrongOnTop: Boolean = false, matchesHouseType: Boolean = false){

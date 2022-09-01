@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -40,8 +41,10 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     //////////////////////////////////////////////
     // private player card info
     //
-    private var currentPlayerNum: Int = -1
+    private var currentPlayerNum: Int = 0
     private var players = ArrayList<Player>()
+    private var playerCardNum = ArrayList<TextView>()
+    private var playerCardTile = ArrayList<CardView>()
 
     private var cardAdapter: CardAdapter? = null
     //
@@ -74,15 +77,29 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         players.add(Player("Player 1", playerNumber = 0, requireContext(), cardManager))
         players.add(Player("Player 2", playerNumber = 1, requireContext(), cardManager))
         players.add(Player("Player 3", playerNumber = 2, requireContext(), cardManager))
-        players.add(Player("Player 4", playerNumber = 3, requireContext(). cardManager))
-        //players.get(0).initPlayerCards(cardManager.randomizeCardList())
+        players.add(Player("Player 4", playerNumber = 3, requireContext(), cardManager))
 
-        newPlayerAlert()
+        playerCardNum.add(binding.player1CardsInfo!!)
+        playerCardNum.add(binding.player2CardsInfo!!)
+        playerCardNum.add(binding.player3CardsInfo!!)
+        playerCardNum.add(binding.player4CardsInfo!!)
+
+        playerCardTile.add(binding.cardViewTile1!!)
+        playerCardTile.add(binding.cardViewTile2!!)
+        playerCardTile.add(binding.cardViewTile3!!)
+        playerCardTile.add(binding.cardViewTile4!!)
+
+        //////////////////////////////////////////////////////
+
+        recyclerView = binding.cardListView
+
+        //cardAdapter = CardAdapter(players[currentPlayerNum].getCards(), this@GameLocalMultiplayer, requireContext())
+        newPlayerAlert(true)
         //cardAdapter = CardAdapter(playerCards!!, this@GameLocalMultiplayer, requireContext())
         //cardAdapter = CardAdapter(players[0].playerCards, this@GameLocalMultiplayer, requireContext())
 
-        recyclerView = binding.cardListView
-        recyclerView!!.adapter = cardAdapter
+
+        //recyclerView!!.adapter = cardAdapter
 
         var layoutManager = FlexboxLayoutManager(requireContext())
         layoutManager.flexDirection = FlexDirection.ROW
@@ -97,7 +114,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         // binding button with onClickListeners
         //
         binding.drawCardButton!!.setOnClickListener {
-            cardManager.drawCardFromStack(players[currentPlayerNum].playerCards, cardAdapter!!)
+            cardManager.drawCardFromStack(players[currentPlayerNum].getCards(), cardAdapter!!)
             updatePlayerInfo()
         }
         binding.drawCard.setOnClickListener { newPlayerAlert() }//drawNewCard() }
@@ -108,24 +125,29 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         cardManager?.setInitialDisplayedCard(binding.displayedCard, binding.currentCardName!!)
     }
 
-    fun newPlayerAlert(){
+    fun newPlayerAlert(firstPlayer: Boolean = false){
         // set new current player index number
-        currentPlayerNum = (currentPlayerNum + 1) % players.size        // player counting starts with 0
+        if(!firstPlayer)
+            currentPlayerNum = (currentPlayerNum + 1) % players.size        // player counting starts with 0
+
+        cardAdapter = CardAdapter(players[currentPlayerNum].getCards(), this@GameLocalMultiplayer, requireContext())
+        recyclerView!!.adapter = cardAdapter
 
         var inflater = LayoutInflater.from(requireContext())
         // TODO: rethink the size of inflated message - too small to cover the other players cards
         var view = inflater.inflate(R.layout.new_player_dialog, null)
-        //var currentPlayerInfo = findViewById(R.id.newPlayerInfo) as TextView
 
         var newPlayerDialog = AlertDialog.Builder(requireContext())
         var title = players[currentPlayerNum].getName() + " will play its turn!"
         newPlayerDialog.setTitle(title)
         newPlayerDialog.setView(view)
+        newPlayerDialog.setCancelable(false)
         newPlayerDialog.setPositiveButton("I'm ready!",
             DialogInterface.OnClickListener { dialogInterface, i ->
-                // TODO: display new current players cards
-                cardAdapter = CardAdapter(players[currentPlayerNum].getCards(), this@GameLocalMultiplayer, requireContext())
                 cardAdapter!!.notifyDataSetChanged()
+                // TODO: change view of new current players tile
+                updatePlayerInfo()
+
             })
         newPlayerDialog.create().show()
     }
@@ -151,10 +173,10 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     }
 
     // TODO: delete?? (deprecated fun - already used in CardManager)
-    private fun drawNewCard() {
+/*    private fun drawNewCard() {
 
         // while new cards are drawed, the state of current cards is reset
-        for(card in players[0].playerCards) card.resetSelected()
+        for(card in players[0].getCards()) card.resetSelected()
         players[0].resetSelectedCards()
 
 
@@ -182,13 +204,13 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         // update the view
         updatePlayerInfo()
         cardAdapter!!.notifyDataSetChanged()
-    }
+    }*/
 
     private fun playCards(){
-        players[currentPlayerNum].playCards(binding.displayedCard, binding.currentCardName!!)
+        if(players[currentPlayerNum].playCards(binding.displayedCard, binding.currentCardName!!))       // if cards played were good - proceed to the next player
+            newPlayerAlert()            // set alert about new players turn
 
         updatePlayerInfo()
-        newPlayerAlert()            // set alert about new players turn
         cardAdapter!!.notifyDataSetChanged()
     }
 
@@ -264,13 +286,22 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
 
     // TODO: updatePlayerInfo
     private fun updatePlayerInfo(){
-        when(currentPlayerNum){
-            0 -> binding.player1CardsInfo!!.text = players[currentPlayerNum].playerCards.size.toString()
-            1 -> binding.player2CardsInfo!!.text = players[currentPlayerNum].playerCards.size.toString()
-            2 -> binding.player3CardsInfo!!.text = players[currentPlayerNum].playerCards.size.toString()
-            3 -> binding.player4CardsInfo!!.text = players[currentPlayerNum].playerCards.size.toString()
-            else -> Log.i("PLAYER_ERROR", "There is no such player!")
+
+        var currIndex = 0
+        for(it in playerCardTile){
+            if(currIndex == currentPlayerNum)
+                it.setCardBackgroundColor(resources.getColor(R.color.player_chosen))
+            else
+                it.setCardBackgroundColor(resources.getColor(R.color.dark_green_tile_background))
+            currIndex++
         }
+
+        currIndex = 0
+        for(it in playerCardNum){
+            it.text = players[currIndex].getCards().size.toString()
+            currIndex++
+        }
+
     }
 
 }

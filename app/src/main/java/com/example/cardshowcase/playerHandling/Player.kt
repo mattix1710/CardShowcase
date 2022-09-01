@@ -13,7 +13,6 @@ class Player(playerName: String, playerNumber: Int, context: Context, cardManage
     private var uniquePlayerID: Int = 123
     private var playerName: String = "Player"
     private var playerNumber: Int = 0
-    private var playerCards = ArrayList<CardItem>()
 
     init {
         this.playerName = playerName
@@ -26,12 +25,11 @@ class Player(playerName: String, playerNumber: Int, context: Context, cardManage
         return uniquePlayerID
     }
 
-    fun getName(){
+    fun getName(): String{
         return playerName
     }
 
-    fun getCards(){
+    fun getCards(): ArrayList<CardItem>{
         return playerCards
     }
-
 }

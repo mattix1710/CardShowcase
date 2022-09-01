@@ -101,6 +101,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewTile1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_row="0"
@@ -121,6 +122,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/player1_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Player 1"
@@ -142,6 +144,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewTile2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_row="0"
@@ -162,6 +165,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/player2_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Player 2"
@@ -171,6 +175,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/player2_cards_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="5"
@@ -182,6 +187,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewTile3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_row="0"
@@ -202,6 +208,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/player3_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Player 3"
@@ -211,6 +218,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/player3_cards_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="5"
@@ -222,6 +230,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewTile4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_row="0"
@@ -242,6 +251,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/player4_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Player 4"
@@ -251,6 +261,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/player4_cards_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="5"
