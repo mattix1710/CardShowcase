@@ -7,6 +7,7 @@ class Penalty(){
 
     var type: PenaltyType = PenaltyType.none
     var drawSum: Int = 0
+    var numOfRounds: Int = 0
     var demandedHouse: DemandHouse = DemandHouse.none
     var demandedFigure: DemandFigure = DemandFigure.none
 
@@ -25,6 +26,7 @@ class Penalty(){
     fun reset(){
         type = PenaltyType.none
         drawSum = 0
+        numOfRounds = 0
         demandedHouse = DemandHouse.none
         demandedFigure = DemandFigure.none
     }
@@ -34,6 +36,7 @@ class Penalty(){
 
         drawSum = 0
         demandedFigure = DemandFigure.none
+        numOfRounds = 0
 
         demandedHouse = when(house){
             HouseType.Clubs -> DemandHouse.Clubs
@@ -49,6 +52,7 @@ class Penalty(){
 
         drawSum = 0
         demandedHouse = DemandHouse.none
+        numOfRounds = 0
 
         demandedFigure = when(figure){
             CardValue.five -> DemandFigure.Five
@@ -62,12 +66,22 @@ class Penalty(){
         }
     }
 
-    fun setDrawCards(quantity: Int = 0){
-        type = PenaltyType.draw
-        drawSum += quantity
+    fun setHaltPlayer(quantity: Int = 0){
+        type = PenaltyType.stop
+        numOfRounds += quantity
 
         demandedFigure = DemandFigure.none
         demandedHouse = DemandHouse.none
+        drawSum = 0
+    }
+
+    fun setDrawCards(value: Int = 2, quantity: Int = 0){
+        type = PenaltyType.draw
+        drawSum += quantity * value
+
+        demandedFigure = DemandFigure.none
+        demandedHouse = DemandHouse.none
+        numOfRounds = 0
     }
 
     fun setDrawBackCards(quantity: Int = 0){
@@ -76,6 +90,7 @@ class Penalty(){
 
         demandedFigure = DemandFigure.none
         demandedHouse = DemandHouse.none
+        numOfRounds = 0
     }
 
     fun addDrawedQuantity(quantity: Int = 0){

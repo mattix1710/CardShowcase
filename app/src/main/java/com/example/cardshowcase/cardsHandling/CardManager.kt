@@ -4,6 +4,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.cardshowcase.R
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 
 class CardManager(val context: Context){
@@ -95,10 +96,17 @@ class CardManager(val context: Context){
                            displayedImg: ImageView,
                            displayedInfo: TextView){
 
+        // select only chosen cards from playerCards
+        var cardsChosen = ArrayList<CardItem>()
+        for(it in selectedCards){
+            cardsChosen.add(playerCards[it])
+        }
+
         // if there is no penalty set
         if(currentPenalty.type.equals(Penalty.PenaltyType.none)) {
-            if(checkIfActionCards(playerCards)){    // if played cards are action cards
+            if(checkIfActionCards(cardsChosen)){    // if played cards are action cards
                 //TODO: set penalty
+                defineActionCards(cardsChosen)
                 //TODO: manageCards()
             } else{                                 // if played cards are regular cards
                 //TODO: manageCards()
@@ -111,11 +119,7 @@ class CardManager(val context: Context){
 
         ///////////////////////////// manageCards()
 
-        var cardsChosen = ArrayList<CardItem>()
 
-        for(it in selectedCards){
-            cardsChosen.add(playerCards[it])
-        }
 
         // set card ON TOP as a displayedCard
         for(card in cardsChosen){
@@ -151,6 +155,39 @@ class CardManager(val context: Context){
                 return true
         }
         return false
+    }
+
+    private fun defineActionCards(cards: ArrayList<CardItem>){
+        // all cards chosen are of the same figure, so we have to check only the last one in the array
+        // last -> it will decide about the penalty of some cards (i.e. king of spades, king od hearts)
+        var currentCard: CardItem? = null
+
+        for(card in cards){
+            if(card.isSelectedOnTop())
+                currentCard = card
+        }
+
+        when(currentCard!!.getCardValue()){
+            CardValue.two -> currentPenalty.setDrawCards(2, cards.size)
+            CardValue.three -> currentPenalty.setDrawCards(3, cards.size)
+            CardValue.four -> currentPenalty.setHaltPlayer(cards.size)
+            CardValue.queen -> currentPenalty.reset()
+            CardValue.jack -> {
+            //TODO: demand figure AlertDialog
+            }
+            CardValue.king -> {
+                if(currentCard!!.getCardType() == HouseType.Spades){
+                    // TODO: rethink
+                    currentPenalty.setDrawBackCards(-5)
+                } else if(currentCard!!.getCardType() == HouseType.Hearts){
+                    currentPenalty.setDrawCards(5, 1)
+                }
+            }
+            CardValue.ace -> {
+                //TODO: demand house AlertDialog
+            }
+            else -> Log.i("ACTION CARDS", "Wrong cards are selected as action cards!")
+        }
     }
 
     fun drawCardFromStack(playerCards: ArrayList<CardItem>,
