@@ -10,12 +10,12 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="32dp"
-        app:layout_constraintBottom_toTopOf="@id/players_info"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/middle_Vertical_guideline">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -32,12 +32,12 @@
                 android:layout_weight="1"
                 android:src="@drawable/card_empty"/>
 
-            <ImageView
-                android:id="@+id/drawCard"
-                android:layout_width="wrap_content"
-                android:layout_height="150dp"
-                android:layout_weight="1"
-                android:src="@drawable/card_back" />
+<!--            <ImageView-->
+<!--                android:id="@+id/drawCard"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="150dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:src="@drawable/card_back" />-->
 
 
         </LinearLayout>
@@ -53,52 +53,14 @@
 
     <GridLayout
         android:id="@+id/players_info"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:columnCount="4"
-        android:rowCount="1"
+        android:columnCount="1"
+        android:rowCount="4"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/middleHorizontal_guideline"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_row="0"
-            android:layout_rowWeight="1"
-            android:layout_column="0"
-            android:layout_columnWeight="1"
-            android:layout_gravity="fill"
-            android:layout_margin="8dp"
-            app:cardBackgroundColor="@color/dark_green_tile_background"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|center_horizontal"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Player 1"
-                    android:textAlignment="center"
-                    android:textColor="@color/player_color"
-                    android:textSize="@dimen/player_name_size"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="5"
-                    android:textAlignment="center"
-                    android:textColor="@color/player_color"
-                    android:textSize="@dimen/player_cards_size"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        app:layout_constraintLeft_toRightOf="@id/middle_Vertical_guideline"
+        app:layout_constraintRight_toRightOf="parent">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardViewTile1"
@@ -147,9 +109,9 @@
             android:id="@+id/cardViewTile2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_row="0"
+            android:layout_row="1"
             android:layout_rowWeight="1"
-            android:layout_column="1"
+            android:layout_column="0"
             android:layout_columnWeight="1"
             android:layout_gravity="fill"
             android:layout_margin="@dimen/player_card_margin"
@@ -190,9 +152,9 @@
             android:id="@+id/cardViewTile3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_row="0"
+            android:layout_row="2"
             android:layout_rowWeight="1"
-            android:layout_column="2"
+            android:layout_column="0"
             android:layout_columnWeight="1"
             android:layout_gravity="fill"
             android:layout_margin="@dimen/player_card_margin"
@@ -233,9 +195,9 @@
             android:id="@+id/cardViewTile4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_row="0"
+            android:layout_row="3"
             android:layout_rowWeight="1"
-            android:layout_column="3"
+            android:layout_column="0"
             android:layout_columnWeight="1"
             android:layout_gravity="fill"
             android:layout_margin="@dimen/player_card_margin"
@@ -273,90 +235,6 @@
         </androidx.cardview.widget.CardView>
     </GridLayout>
 
-    <!--<RelativeLayout
-        android:id="@+id/relativeLayoutCardList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/drawCardButton"
-        app:layout_constraintTop_toBottomOf="@id/middleHorizontal_guideline"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <GridView
-            android:id="@+id/card_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:horizontalSpacing="5dp"
-            android:verticalSpacing="5dp"
-            android:numColumns="10"
-            tools:listitem="@layout/single_card">
-
-        </GridView>
-
-    </RelativeLayout>-->
-
-    <!--<ScrollView
-        android:id="@+id/card_list_view"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:fillViewport="false"
-        app:layout_constraintTop_toBottomOf="@+id/middleHorizontal_guideline"
-        app:layout_constraintBottom_toTopOf="@+id/drawCardButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <com.google.android.flexbox.FlexboxLayout
-            android:layout_margin="4dp"
-            android:id="@+id/card_list_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            app:alignContent="flex_start"
-            app:alignItems="stretch"
-            app:justifyContent="center"
-            app:flexWrap="wrap"
-            app:layout_constraintTop_toBottomOf="@+id/middleHorizontal_guideline"
-            app:layout_constraintBottom_toTopOf="@+id/drawCardButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-        </com.google.android.flexbox.FlexboxLayout>
-    </ScrollView>-->
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/card_list_view"
         android:layout_width="match_parent"
@@ -369,40 +247,6 @@
         />
 
 
-    <Button
-        android:id="@+id/button_first"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/next"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/current_free_cards"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="54"
-        android:textSize="25sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/middleHorizontal_guideline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
-
-    <TextView
-        android:id="@+id/current_free_cards_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cards left:"
-        android:textSize="20sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/card_list_view"
-        app:layout_constraintEnd_toStartOf="@+id/current_free_cards"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/middle_Vertical_guideline"
         android:layout_width="wrap_content"
@@ -413,14 +257,59 @@
     <TextView
         android:id="@+id/current_card_name"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:text="@string/card_on_stack_info"
         android:textColor="@color/current_card_info"
         android:textSize="@dimen/current_card_info_size"
-        app:layout_constraintBottom_toTopOf="@+id/players_info"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/layout_penalty"
         app:layout_constraintEnd_toStartOf="@+id/middle_Vertical_guideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_penalty"
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/current_card_name"
+        app:layout_constraintBottom_toTopOf="@id/middleHorizontal_guideline"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/middle_Vertical_guideline">
+
+        <View
+            android:id="@+id/penalty_separator"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/separator_size"
+            android:background="@color/line_separator"
+            android:layout_marginBottom="@dimen/separator_margin"
+            android:layout_marginLeft="3dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/penalty_text"/>
+        <TextView
+            android:id="@+id/penalty_text"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:text="PENALTY"
+            android:textSize="10sp"
+            app:layout_constraintVertical_weight="4"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/penalty_separator"
+            app:layout_constraintBottom_toTopOf="@id/current_penalty_info"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
+        <TextView
+            android:id="@+id/current_penalty_info"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:text="@string/penalty_text"
+            android:textSize="@dimen/penalty_text_size"
+            app:layout_constraintVertical_weight="8"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/penalty_text"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
         android:id="@+id/drawCardButton"
@@ -447,6 +336,7 @@
         android:id="@+id/onTopOfCardsGuard"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginVertical="8dp"
         app:layout_constraintTop_toTopOf="@id/middleHorizontal_guideline"
         app:layout_constraintBottom_toBottomOf="@id/down_horizontal_guideline"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -460,4 +350,53 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_end="60dp" />
+
+    <View
+        android:id="@+id/separator_vertical"
+        android:layout_width="@dimen/separator_size"
+        android:layout_height="0dp"
+        android:background="@color/line_separator"
+        android:layout_marginTop="@dimen/separator_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/middleHorizontal_guideline"
+        app:layout_constraintLeft_toLeftOf="@id/middle_Vertical_guideline"
+        app:layout_constraintRight_toRightOf="@id/middle_Vertical_guideline"/>
+
+    <View
+        android:id="@+id/separator_horizontal_middle"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/separator_size"
+        android:background="@color/line_separator"
+        android:layout_marginLeft="@dimen/separator_margin"
+        android:layout_marginRight="@dimen/separator_margin"
+        app:layout_constraintTop_toTopOf="@id/middleHorizontal_guideline"
+        app:layout_constraintBottom_toBottomOf="@id/middleHorizontal_guideline"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <View
+        android:id="@+id/separator_horizontal_down"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/separator_size"
+        android:background="@color/line_separator"
+        android:layout_marginLeft="@dimen/separator_margin"
+        android:layout_marginRight="@dimen/separator_margin"
+        app:layout_constraintTop_toTopOf="@id/down_horizontal_guideline"
+        app:layout_constraintBottom_toBottomOf="@id/down_horizontal_guideline"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <View
+        android:id="@+id/separator_vertical_middle_down"
+        android:layout_width="@dimen/separator_size"
+        android:layout_height="0dp"
+        android:background="@color/line_separator"
+        android:layout_marginBottom="@dimen/separator_margin"
+        app:layout_constraintTop_toBottomOf="@id/down_horizontal_guideline"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/middle_Vertical_guideline"
+        app:layout_constraintRight_toRightOf="@id/middle_Vertical_guideline"/>
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

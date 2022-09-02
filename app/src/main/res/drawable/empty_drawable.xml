@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <stroke android:width="5dp" android:color="#FF207D94" />
+            <stroke android:width="5dp" android:color="#00207D94" />
             <padding android:left="2dp"
                 android:top="2dp"
                 android:right="2dp"
@@ -21,7 +21,7 @@
                 android:type="radial"
                 android:gradientRadius="200%p"
                 android:startColor="@color/transparent"
-                android:endColor="#373737"
+                android:endColor="#00373737"
                 />
         </shape>
     </item>

@@ -3,5 +3,8 @@
     <dimen name="player_name_size">15sp</dimen>
     <dimen name="player_cards_size">20sp</dimen>
     <dimen name="player_card_margin">4dp</dimen>
-    <dimen name="current_card_info_size">20sp</dimen>
+    <dimen name="current_card_info_size">15sp</dimen>
+    <dimen name="penalty_text_size">15dp</dimen>
+    <dimen name="separator_margin">5dp</dimen>
+    <dimen name="separator_size">2dp</dimen>
 </resources>

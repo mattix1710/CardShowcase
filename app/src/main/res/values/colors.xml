@@ -17,4 +17,5 @@
     <color name="player_color">#323232</color>
     <color name="current_card_info">#F5CC4D</color>
     <color name="current_card_functional_info">#C40000</color>
+    <color name="line_separator">#80303030</color>
 </resources>

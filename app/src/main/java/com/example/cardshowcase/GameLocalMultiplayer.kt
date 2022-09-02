@@ -69,9 +69,9 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         // set initial resources
         cardManager = CardManager(requireContext())
 
-        binding.buttonFirst.setOnClickListener {
-            findNavController().navigate(R.id.action_GameLocalMultiplayer_to_MainFragment)
-        }
+//        binding.buttonFirst.setOnClickListener {
+//            findNavController().navigate(R.id.action_GameLocalMultiplayer_to_MainFragment)
+//        }
 
         // initialize players and draw cards to their hands
         players.add(Player("Player 1", playerNumber = 0, requireContext(), cardManager))
@@ -116,8 +116,9 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         binding.drawCardButton!!.setOnClickListener {
             cardManager.drawCardFromStack(players[currentPlayerNum].getCards(), cardAdapter!!)
             updatePlayerInfo()
+
         }
-        binding.drawCard.setOnClickListener { newPlayerAlert() }//drawNewCard() }
+//        binding.drawCard.setOnClickListener { newPlayerAlert() }//drawNewCard() }
         binding.playCardbutton!!.setOnClickListener{ playCards() }
         playCardsButtonUpdate()
 
