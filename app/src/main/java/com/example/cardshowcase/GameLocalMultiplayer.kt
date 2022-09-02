@@ -31,6 +31,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     //
     private lateinit var cardManager: CardManager
     private var penalty: Int = 0
+    private var penaltyArise: Boolean = false
     //
     //////////////////////////////////////////////
 
@@ -198,6 +199,14 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun checkForPenalties(){
+        if(penaltyArise){
+
+        }else{
+
+        }
     }
 
     // TODO: card game logic
