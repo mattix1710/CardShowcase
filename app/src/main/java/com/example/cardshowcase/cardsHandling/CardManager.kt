@@ -1,11 +1,13 @@
 package com.example.cardshowcase.cardsHandling
 
-import android.widget.ImageView
-import android.widget.TextView
-import com.example.cardshowcase.R
+import android.app.AlertDialog
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.widget.*
+import com.example.cardshowcase.R
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+
 
 class CardManager(val context: Context){
 
@@ -14,6 +16,8 @@ class CardManager(val context: Context){
     var usedPlayingCards = ArrayList<CardItem>()
     var displayedCard    = CardItem(R.drawable.card_empty)
     var currentPenalty: Penalty = Penalty()
+
+    var queenFunctional: Boolean = false
 
     init {
         populateCardDeck()
@@ -174,6 +178,7 @@ class CardManager(val context: Context){
             CardValue.queen -> currentPenalty.reset()
             CardValue.jack -> {
             //TODO: demand figure AlertDialog
+                demandedFigureAlertDialog()
             }
             CardValue.king -> {
                 if(currentCard!!.getCardType() == HouseType.Spades){
@@ -185,6 +190,7 @@ class CardManager(val context: Context){
             }
             CardValue.ace -> {
                 //TODO: demand house AlertDialog
+                demandedHouseAlertDialog()
             }
             else -> Log.i("ACTION CARDS", "Wrong cards are selected as action cards!")
         }
@@ -203,6 +209,70 @@ class CardManager(val context: Context){
         }
 
         cardAdapter.notifyDataSetChanged()
+    }
+
+    private fun demandedFigureAlertDialog(){
+        var singleItems = arrayOf("5", "6", "7", "8", "9", "10")
+        if(queenFunctional)
+            singleItems.plus("Queen")
+        var checkedItem = 0
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.demand_figure_message)
+            .setNeutralButton(R.string.demand_figure_cancel){
+                dialog, which ->
+                // Returns Jack as a regular card
+                currentPenalty.demandedFigure = Penalty.DemandFigure.none
+            }
+            .setPositiveButton(R.string.demand_figure_ok){ dialog, which ->
+                // Accept current choice
+                when(checkedItem){
+                    0 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Five
+                    1 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Six
+                    2 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Seven
+                    3 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Eight
+                    4 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Nine
+                    5 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Ten
+                    6 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Queen
+                    else -> currentPenalty.demandedFigure = Penalty.DemandFigure.none
+                }
+            }
+            .setSingleChoiceItems(singleItems, checkedItem){ dialog, which ->
+                Log.i("DEMAND", which.toString())
+                checkedItem = which
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun demandedHouseAlertDialog(){
+        val singleItems = arrayOf(context.resources.getString(R.string.heart_emoji),
+                        context.resources.getString(R.string.clubs_emoji),
+                        context.resources.getString(R.string.spades_emoji),
+                        context.resources.getString(R.string.diamond_emoji))
+        var checkedItem = 0
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.demand_house_message)
+            .setNeutralButton(R.string.demand_house_cancel){ dialog, which ->
+                // Returns Ace as a regular card
+                currentPenalty.demandedHouse = Penalty.DemandHouse.none
+            }
+            .setPositiveButton(R.string.demand_house_ok){ dialog, which ->
+                // Accept current choice
+                when(checkedItem){
+                    0 -> currentPenalty.demandedHouse = Penalty.DemandHouse.Hearts
+                    1 -> currentPenalty.demandedHouse = Penalty.DemandHouse.Clubs
+                    2 -> currentPenalty.demandedHouse = Penalty.DemandHouse.Spades
+                    3 -> currentPenalty.demandedHouse = Penalty.DemandHouse.Diamonds
+                    else -> currentPenalty.demandedHouse = Penalty.DemandHouse.none
+                }
+            }
+            .setSingleChoiceItems(singleItems, checkedItem){ dialog, which ->
+                checkedItem = which
+            }
+            .setCancelable(false)
+            .show()
     }
 
     private fun populateCardDeck() {

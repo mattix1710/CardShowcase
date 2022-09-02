@@ -179,14 +179,17 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     private fun drawCards(){
         cardManager.drawCardFromStack(players[currentPlayerNum].getCards(), cardAdapter!!)
         players[currentPlayerNum].resetSelectedCards()
-        newPlayerAlert()
+        //newPlayerAlert()
         updatePlayerInfo()
     }
 
     private fun playCards(){
-        if(players[currentPlayerNum].playCards(binding.displayedCard, binding.currentCardName!!))       // if cards played were good - proceed to the next player
-            newPlayerAlert()            // set alert about new players turn
+        if(players[currentPlayerNum].playCards(binding.displayedCard, binding.currentCardName!!)) {      // if cards played were good - proceed to the next player
+            //newPlayerAlert()            // set alert about new players turn
+            playCardsButtonUpdate()
+        }
 
+        playCardsButtonUpdate()
         updatePlayerInfo()
         cardAdapter!!.notifyDataSetChanged()
     }

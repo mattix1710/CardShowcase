@@ -23,4 +23,18 @@
     <string name="action_instructions">Game Instruction</string>
     <string name="penalty_text">-</string>
     <string name="play_local_multiplayer">Local multiplayer</string>
+
+    <string name="demand_figure_message">What figure do you want to choose?</string>
+    <string name="demand_figure_cancel">Play Jack as a regular card</string>
+    <string name="demand_figure_ok">Demand choice</string>
+
+    <string name="demand_house_message">What house do you want to demand?</string>
+    <string name="demand_house_cancel">Play Ace as a regular card</string>
+    <string name="demand_house_ok">Demand choice</string>
+
+    <string name="heart_emoji">♥</string>
+    <string name="spades_emoji">♠</string>
+    <string name="diamond_emoji">♦</string>
+    <string name="clubs_emoji">♣</string>
+
 </resources>
