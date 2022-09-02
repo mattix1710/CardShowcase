@@ -14,8 +14,10 @@ class CardItem {
     private var cardID: Int = 0
     private var type: HouseType = HouseType.none
     private var value: CardValue = CardValue.none
-    private var wasPlayed: Boolean = false
+
     private var isFunctional: Boolean = false               // informs about functionality of a card (2,3,4,J,Q,K_spades, K_hearts,A)
+    private var wasPlayed: Boolean = false                  // variable connected to "isFunctional" one - tells if an action card was already used (there is no penalty)
+
     private var isSelected: Boolean = false
     private var isSelectedOnTop: Boolean = false
 

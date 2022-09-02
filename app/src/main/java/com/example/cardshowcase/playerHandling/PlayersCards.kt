@@ -109,7 +109,12 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
         }
     }
 
-    // TODO: playCards - złączyć playCards() i managePlayingCards()
+    /**
+     * function used to play selected cards from players hand
+     * - checks if selected cards are properly chosen
+     * - if correct -> cardManager will take care of the cards
+     * - if incorrect -> there will be an AlertDialog displayed
+     * **/
     fun playCards(displayedCard: ImageView, displayedCardInfo: TextView): Boolean{
         var isGood: Boolean = false
 

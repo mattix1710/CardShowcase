@@ -7,10 +7,12 @@ import android.content.Context
 import android.widget.Toast
 
 class CardManager(val context: Context){
+
     var allPlayingCards  = ArrayList<CardItem>()
     var currentFreeCards = ArrayList<CardItem>()
     var usedPlayingCards = ArrayList<CardItem>()
     var displayedCard    = CardItem(R.drawable.card_empty)
+    var currentPenalty: Penalty = Penalty()
 
     init {
         populateCardDeck()
@@ -83,11 +85,32 @@ class CardManager(val context: Context){
         return currentFreeCards.get(randomizer(0, currentFreeCards.size, false))
     }
 
-    // TODO: managePlayingCards - fajnie by było tu wrzucić, ale od cholery jest argumentów do przesłania
+    /** function used to play chosen cards
+     * - sets current on top card as displayed card
+     * - removes cards from the players hand
+     * - manages used cards
+     * **/
     fun managePlayingCards(selectedCards: ArrayList<Int>,
                            playerCards: ArrayList<CardItem>,
                            displayedImg: ImageView,
                            displayedInfo: TextView){
+
+        // if there is no penalty set
+        if(currentPenalty.type.equals(Penalty.PenaltyType.none)) {
+            if(checkIfActionCards(playerCards)){    // if played cards are action cards
+                //TODO: set penalty
+                //TODO: manageCards()
+            } else{                                 // if played cards are regular cards
+                //TODO: manageCards()
+            }
+        } else if(currentPenalty.type.equals(Penalty.PenaltyType.draw)){
+            if(checkIfActionCards(playerCards)){
+                //TODO: action cards
+            }
+        }
+
+        ///////////////////////////// manageCards()
+
         var cardsChosen = ArrayList<CardItem>()
 
         for(it in selectedCards){
@@ -120,6 +143,14 @@ class CardManager(val context: Context){
             Toast.makeText(context, "You played ${selectedCards.size} cards!", Toast.LENGTH_SHORT).show()
 
         setCurrentCardInfo(displayedInfo)
+    }
+
+    private fun checkIfActionCards(cards: ArrayList<CardItem>): Boolean{
+        for(card in cards){
+            if(card.isFunctional())
+                return true
+        }
+        return false
     }
 
     fun drawCardFromStack(playerCards: ArrayList<CardItem>,
