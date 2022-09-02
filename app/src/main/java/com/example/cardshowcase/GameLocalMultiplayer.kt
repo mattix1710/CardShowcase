@@ -97,8 +97,6 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         newPlayerAlert(true)
         //cardAdapter = CardAdapter(playerCards!!, this@GameLocalMultiplayer, requireContext())
         //cardAdapter = CardAdapter(players[0].playerCards, this@GameLocalMultiplayer, requireContext())
-
-
         //recyclerView!!.adapter = cardAdapter
 
         var layoutManager = FlexboxLayoutManager(requireContext())
@@ -113,12 +111,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         //////////////////////////////////////////////////
         // binding button with onClickListeners
         //
-        binding.drawCardButton!!.setOnClickListener {
-            cardManager.drawCardFromStack(players[currentPlayerNum].getCards(), cardAdapter!!)
-            updatePlayerInfo()
-
-        }
-//        binding.drawCard.setOnClickListener { newPlayerAlert() }//drawNewCard() }
+        binding.drawCardButton!!.setOnClickListener { drawCards() }
         binding.playCardbutton!!.setOnClickListener{ playCards() }
         playCardsButtonUpdate()
 
@@ -180,39 +173,14 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         cardAdapter!!.notifyDataSetChanged()
     }
 
-    // TODO: delete?? (deprecated fun - already used in CardManager)
-/*    private fun drawNewCard() {
+    //////////////////////// playing cards ///////////////////////
 
-        // while new cards are drawed, the state of current cards is reset
-        for(card in players[0].getCards()) card.resetSelected()
-        players[0].resetSelectedCards()
-
-
-        var quantityToGet: Int
-        if(penalty == 0)
-            quantityToGet = 1
-        else {
-            quantityToGet = penalty
-            cardManager.displayedCard.setCardPlayed()
-        }
-
-        for(it in 1..quantityToGet) {
-            if(cardManager.shuffleUsedCards()) {            // if there are cards available
-                var randomizedCard: CardItem = cardManager.drawFromFreeCards()
-                players[0].playerCards.add(randomizedCard)
-
-                //update cardAdapter
-                cardManager.currentFreeCards.remove(randomizedCard)
-            }
-        }
-
-        Log.i("FREE CARDS", cardManager.currentFreeCards.size.toString())
-        Log.i("USED CARDS", cardManager.usedPlayingCards.size.toString())
-
-        // update the view
+    private fun drawCards(){
+        cardManager.drawCardFromStack(players[currentPlayerNum].getCards(), cardAdapter!!)
+        players[currentPlayerNum].resetSelectedCards()
+        newPlayerAlert()
         updatePlayerInfo()
-        cardAdapter!!.notifyDataSetChanged()
-    }*/
+    }
 
     private fun playCards(){
         if(players[currentPlayerNum].playCards(binding.displayedCard, binding.currentCardName!!))       // if cards played were good - proceed to the next player

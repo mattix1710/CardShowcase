@@ -22,4 +22,5 @@
     <string name="instruction_subtitle_2">Action Cards</string>
     <string name="action_instructions">Game Instruction</string>
     <string name="penalty_text">-</string>
+    <string name="play_local_multiplayer">Local multiplayer</string>
 </resources>

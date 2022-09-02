@@ -12,16 +12,16 @@
         android:layout_height="wrap_content"
         android:text="@string/game_title"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@id/button_play"
+        app:layout_constraintBottom_toTopOf="@id/button_play_local_multi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button_play"
+        android:id="@+id/button_play_local_multi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/start_game"
+        android:text="@string/play_local_multiplayer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
