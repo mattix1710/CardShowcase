@@ -220,16 +220,6 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                 playCardsUpdate()
             }
         }
-//        if(players[currentPlayerNum].playCards(binding.displayedCard,
-//                binding.currentCardName!!,
-//                binding.currentPenaltyInfo!!)) {      // if cards played were good - proceed to the next player
-//            newPlayerAlert()            // set alert about new players turn
-//            playCardsButtonUpdate()
-//        }
-
-//        playCardsButtonUpdate()
-//        updatePlayerInfo()
-//        cardAdapter!!.notifyDataSetChanged()
     }
 
     private fun playCardsUpdate(){
@@ -377,19 +367,21 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
 
         var negButtonMessage = when(cardManager.currentPenalty.type){
             Penalty.PenaltyType.draw -> "Save and draw the rest"
-            else -> "Save and exit"
+            else -> "Keep it"
         }
 
         dialogBuilder.setCancelable(false)
         dialogBuilder.setMessage(message)
-        dialogBuilder.setPositiveButton("Play this card",
-            DialogInterface.OnClickListener{ dialogInterface, i ->
-                // play the last card
-                players[currentPlayerNum].resetSelectedCards()
-                players[currentPlayerNum].selectedCard(players[currentPlayerNum].getCards().size-1)
-                players[currentPlayerNum].setRevenge()
-                playCards()
-            })
+        if(cardManager.currentPenalty.check(drawedCard, cardManager.displayedCard)) {
+            dialogBuilder.setPositiveButton("Play this card",
+                DialogInterface.OnClickListener { dialogInterface, i ->
+                    // play the last card
+                    players[currentPlayerNum].resetSelectedCards()
+                    players[currentPlayerNum].selectedCard(players[currentPlayerNum].getCards().size - 1)
+                    players[currentPlayerNum].setRevenge()
+                    playCards()
+                })
+        }
         dialogBuilder.setNegativeButton(negButtonMessage,
             DialogInterface.OnClickListener { dialogInterface, i ->
                 cardManager.currentPenalty.reset()
@@ -452,6 +444,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                     6 -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.Queen
                     else -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.none
                 }
+                cardManager.currentPenalty.type = Penalty.PenaltyType.demandFigure
                 cardManager.currentPenalty.setPenalty(arrayListOf(cardManager.displayedCard))
                 playCardsUpdate()
             }
@@ -486,6 +479,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                     3 -> cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.Diamonds
                     else -> cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.none
                 }
+                cardManager.currentPenalty.type = Penalty.PenaltyType.demandHouse
                 cardManager.currentPenalty.setPenalty(arrayListOf(cardManager.displayedCard))
                 playCardsUpdate()
             }
