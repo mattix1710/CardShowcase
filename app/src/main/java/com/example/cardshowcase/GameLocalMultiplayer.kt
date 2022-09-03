@@ -1,5 +1,6 @@
 package com.example.cardshowcase
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.os.Bundle
@@ -102,7 +103,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         //cardAdapter = CardAdapter(players[0].playerCards, this@GameLocalMultiplayer, requireContext())
         //recyclerView!!.adapter = cardAdapter
 
-        var layoutManager = FlexboxLayoutManager(requireContext())
+        val layoutManager = FlexboxLayoutManager(requireContext())
         layoutManager.flexDirection = FlexDirection.ROW
         //layoutManager.alignContent = AlignContent.FLEX_START          // cannot be used in FlexboxLayoutManager
         layoutManager.alignItems = AlignItems.STRETCH
@@ -122,6 +123,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         cardManager?.setInitialDisplayedCard(binding.displayedCard, binding.currentCardName!!)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun newPlayerAlert(firstPlayer: Boolean = false){
         // set new current player index number
         if(!firstPlayer)
@@ -133,10 +135,6 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
 
         cardAdapter = CardAdapter(players[currentPlayerNum].getCards(), this@GameLocalMultiplayer, requireContext())
         recyclerView!!.adapter = cardAdapter
-
-//        var inflater = LayoutInflater.from(requireContext())
-//        // TODO: rethink the size of inflated message - too small to cover the other players cards
-//        var view = inflater.inflate(R.layout.new_player_dialog, null)
 
         val newPlayerDialog = AlertDialog.Builder(requireContext())
         val message = players[currentPlayerNum].getName() + " will play its turn!"
@@ -153,7 +151,6 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                 binding.cardListView!!.bringToFront()
 
                 if(cardManager.currentPenalty.enabled()){
-                    // TODO: display penalty ALERT DIALOG for the new player
                     penaltyCheckerAlertDialog()
                 }
             })
@@ -162,6 +159,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
 
     //////////////////////// onItemClick ///////////////////////
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onItemClick(position: Int, view: View) {
         Log.i("Card_click", "card_${position}")
 
@@ -172,6 +170,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         cardAdapter!!.notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onItemLongClick(position: Int, view: View) {
 
         players[currentPlayerNum].selectedCardLong(position)
@@ -222,6 +221,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun playCardsUpdate(){
         newPlayerAlert()
         playCardsButtonUpdate()
@@ -419,7 +419,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     }
 
     private fun demandedFigureAlertDialog(){
-        var singleItems = arrayOf("5", "6", "7", "8", "9", "10")
+        val singleItems = arrayOf("5", "6", "7", "8", "9", "10")
         if(cardManager.queenFunctional)
             singleItems.plus("Queen")
         var checkedItem = 0

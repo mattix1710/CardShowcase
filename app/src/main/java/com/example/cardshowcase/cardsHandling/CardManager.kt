@@ -1,5 +1,6 @@
 package com.example.cardshowcase.cardsHandling
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.util.Log
@@ -66,6 +67,7 @@ class CardManager(val context: Context, val penaltyInfo: TextView){
      * sets information (value and house) of currently displayed card on stack
      * * wasFirst - variable indicating that it was the card played at the beginning of the game - i. e. when it was an action card
      */
+    @SuppressLint("SetTextI18n")
     fun setCurrentCardInfo(currentCard: TextView, wasFirst: Boolean = false){
         var value: String = displayedCard.getCardValueName()
         var house: String = displayedCard.getCardType().toString()
@@ -112,7 +114,6 @@ class CardManager(val context: Context, val penaltyInfo: TextView){
      * - manages used cards
      * - sets the penalty if action cards played
      * **/
-    // TODO: manage cards when penalty enabled
     fun managePlayingCards(cardsChosen: ArrayList<CardItem>,
                            playerCards: ArrayList<CardItem>,
                            displayedImg: ImageView,
@@ -187,114 +188,7 @@ class CardManager(val context: Context, val penaltyInfo: TextView){
         penaltyInfo.text = "-"
     }
 
-
-
-
-    /** function used to play chosen cards
-     * - sets current on top card as displayed card
-     * - removes cards from the players hand
-     * - manages used cards
-     * **/
-    fun managePlayingCards1(selectedCards: ArrayList<Int>,
-                           playerCards: ArrayList<CardItem>,
-                           displayedImg: ImageView,
-                           displayedInfo: TextView){
-
-        // select only chosen cards from playerCards
-        var cardsChosen = ArrayList<CardItem>()
-        for(it in selectedCards){
-            cardsChosen.add(playerCards[it])
-        }
-
-//        // if there is no penalty set
-//        if(currentPenalty.type.equals(Penalty.PenaltyType.none)) {
-//            if(checkIfActionCards(cardsChosen)){    // if played cards are action cards
-//                //TODO: set penalty
-//                defineActionCards(cardsChosen)
-//                //TODO: manageCards()
-//            } else{                                 // if played cards are regular cards
-//                //TODO: manageCards()
-//            }
-//        } else if(currentPenalty.type.equals(Penalty.PenaltyType.draw)){
-//            if(checkIfActionCards(playerCards)){
-//                //TODO: action cards
-//            }
-//        }
-
-        //////////////// MANAGES CARDS in hand & displayed ////////////////
-
-        // set card ON TOP as a displayedCard
-        for(card in cardsChosen){
-            if(card.isSelectedOnTop()){
-                usedPlayingCards.add(displayedCard)
-                card.resetSelected()
-                displayedCard = card
-                displayedImg.setImageResource(displayedCard.getCardId())
-                playerCards.remove(card)
-                cardsChosen.remove(card)
-                break
-            }
-        }
-
-        // for rest of the cards
-        for(card in cardsChosen){
-            card.resetSelected()
-            usedPlayingCards.add(card)
-            playerCards.remove(card)
-        }
-
-        if(selectedCards.size == 1)
-            Toast.makeText(context, "You played ${selectedCards.size} card!", Toast.LENGTH_SHORT).show()
-        else
-            Toast.makeText(context, "You played ${selectedCards.size} cards!", Toast.LENGTH_SHORT).show()
-
-        setCurrentCardInfo(displayedInfo)
-    }
-
-    private fun checkIfActionCards(cards: ArrayList<CardItem>): Boolean{
-        for(card in cards){
-            if(card.isFunctional())
-                return true
-        }
-        return false
-    }
-
-    // TODO: remove?
-//    private fun defineActionCards(cards: ArrayList<CardItem>){
-//        // all cards chosen are of the same figure, so we have to check only the last one in the array
-//        // last -> it will decide about the penalty of some cards (i.e. king of spades, king od hearts)
-//        var currentCard: CardItem? = null
-//
-//        for(card in cards){
-//            if(card.isSelectedOnTop())
-//                currentCard = card
-//        }
-//
-//        when(currentCard!!.getCardValue()){
-//            CardValue.two -> currentPenalty.setDrawCards(2, cards.size)
-//            CardValue.three -> currentPenalty.setDrawCards(3, cards.size)
-//            CardValue.four -> currentPenalty.setHaltPlayer(cards.size)
-//            CardValue.queen -> currentPenalty.reset()
-//            CardValue.jack -> {
-//            //TODO: demand figure AlertDialog
-//                demandedFigureAlertDialog()
-//            }
-//            CardValue.king -> {
-//                if(currentCard!!.getCardType() == HouseType.Spades){
-//                    // TODO: rethink
-//                    currentPenalty.setDrawBackCards(-5)
-//                } else if(currentCard!!.getCardType() == HouseType.Hearts){
-//                    currentPenalty.setDrawCards(5, 1)
-//                }
-//            }
-//            CardValue.ace -> {
-//                //TODO: demand house AlertDialog
-//                demandedHouseAlertDialog()
-//            }
-//            else -> Log.i("ACTION CARDS", "Wrong cards are selected as action cards!")
-//        }
-//    }
-
+    @SuppressLint("NotifyDataSetChanged")
     fun drawCardFromStack(playerCards: ArrayList<CardItem>,
                           cardAdapter: CardAdapter){
         var quantityToGet: Int = 1

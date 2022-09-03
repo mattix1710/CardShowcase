@@ -1,5 +1,6 @@
 package com.example.cardshowcase.playerHandling
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.util.Log
@@ -199,79 +200,8 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
         return demandedType
     }
 
-    /**
-     * function used to play selected cards from players hand
-     * - checks if selected cards are properly chosen
-     * - if correct -> cardManager will take care of the cards
-     * - if incorrect -> there will be an AlertDialog displayed
-     * **/
-    //TODO: playCards - rozkopane jak cały Poznań
-/*
-    fun playCards1(displayedCard: ImageView, displayedCardInfo: TextView): Boolean{
-        var isGood: Boolean = false
-
-//        if(cardManager.currentPenalty.enabled())    // if there is an active penalty waiting for the player
-//        {
-////            if(penaltyCheckerAlertDialog()){
-////
-////            }
-//
-//            if(cardManager.currentPenalty.type == Penalty.PenaltyType.draw){
-//
-//            }
-//
-//        } else{                                     // otherwise - if there is no penalty set
-//
-//        }
-
-        if(selectedCards.list.size == 1){
-            var card = playerCards[selectedCards.list[0]]
-            if(cardManager.displayedCard.getCardValue() == card.getCardValue()
-                || cardManager.displayedCard.getCardType() == card.getCardType()){
-                cardManager.managePlayingCards(selectedCards.list, playerCards,
-                    displayedCard, displayedCardInfo)
-                resetSelectedCards()
-                isGood = true
-            } else{
-                wrongCardAlertDialog()
-                isGood = false
-            }
-        } else if(selectedCards.selectionType == SelectedCardsStruct.SelectionType.value){
-            // if selected cards have the same value as displayed card - i.e. stacking the same value
-            cardManager.managePlayingCards(selectedCards.list, playerCards, displayedCard, displayedCardInfo)
-            resetSelectedCards()
-            isGood = true
-        } else if(selectedCards.selectionType == SelectedCardsStruct.SelectionType.house){
-            // if selected cards base on the house type of the displayed card
-            var matchesHouseType: Boolean = false
-            var wrongOnTop: Boolean = false
-
-            for(it in selectedCards.list){
-                if(playerCards[it].getCardType() == cardManager.displayedCard.getCardType())
-                    matchesHouseType = true
-                if(playerCards[it].isSelectedOnTop()){
-                    if (playerCards[it].getCardType() == cardManager.displayedCard.getCardType()){
-                        wrongOnTop = true
-                        break
-                    }
-                }
-            }
-
-            if(wrongOnTop || !matchesHouseType){
-                wrongCardAlertDialog(wrongOnTop, matchesHouseType)
-                isGood = false
-            } else{
-                cardManager.managePlayingCards(selectedCards.list, playerCards, displayedCard, displayedCardInfo)
-                resetSelectedCards()
-                isGood = true
-            }
-        }
-
-        return isGood
-    }
-*/
-
-    private fun wrongCardAlertDialog(mess: String){
+    //INFO: used in previous commits - maybe erase
+/*    private fun wrongCardAlertDialog(mess: String){
         val alert = AlertDialog.Builder(context)
         var cardOnStack = cardManager.displayedCard
 
@@ -280,7 +210,7 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
         }
         alert.setPositiveButton("Choose another card", null)
         alert.create().show()
-    }
+    }*/
 
     private fun wrongCardAlertDialog(wrongOnTop: Boolean = false, matchesHouseType: Boolean = false){
         val alert = AlertDialog.Builder(context)
@@ -320,6 +250,7 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
         alert.create().show()
     }
 
+    @SuppressLint("SetTextI18n")
     fun playCardsButtonUpdate(playCardButton: Button){
         when(selectedCards.list.size){
             0 -> {
