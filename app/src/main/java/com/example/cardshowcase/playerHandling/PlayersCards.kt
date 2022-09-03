@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.example.cardshowcase.cardsHandling.CardItem
 import com.example.cardshowcase.cardsHandling.CardManager
 import com.example.cardshowcase.cardsHandling.CardValue
+import com.example.cardshowcase.cardsHandling.Penalty
 
 open class PlayersCards(val context: Context, val cardManager: CardManager) {
     class SelectedCardsStruct{
@@ -115,8 +116,23 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
      * - if correct -> cardManager will take care of the cards
      * - if incorrect -> there will be an AlertDialog displayed
      * **/
+    //TODO: playCards - rozkopane jak cały Poznań
     fun playCards(displayedCard: ImageView, displayedCardInfo: TextView): Boolean{
         var isGood: Boolean = false
+
+//        if(cardManager.currentPenalty.enabled())    // if there is an active penalty waiting for the player
+//        {
+////            if(penaltyCheckerAlertDialog()){
+////
+////            }
+//
+//            if(cardManager.currentPenalty.type == Penalty.PenaltyType.draw){
+//
+//            }
+//
+//        } else{                                     // otherwise - if there is no penalty set
+//
+//        }
 
         if(selectedCards.list.size == 1){
             var card = playerCards[selectedCards.list[0]]

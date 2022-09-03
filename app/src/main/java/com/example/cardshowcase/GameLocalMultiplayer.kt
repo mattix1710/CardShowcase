@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -126,30 +127,34 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
             currentPlayerNum = (currentPlayerNum + 1) % players.size        // player counting starts with 0
 
         // set a curtain in front of the newly chosen cards - for the other players not to see cards
-        binding.onTopOfCardsGuard!!.background = resources.getDrawable(R.drawable.background_rectangle)
+        binding.onTopOfCardsGuard!!.background = ResourcesCompat.getDrawable(resources, R.drawable.background_rectangle, null)
         binding.onTopOfCardsGuard!!.bringToFront()
 
         cardAdapter = CardAdapter(players[currentPlayerNum].getCards(), this@GameLocalMultiplayer, requireContext())
         recyclerView!!.adapter = cardAdapter
 
-        var inflater = LayoutInflater.from(requireContext())
-        // TODO: rethink the size of inflated message - too small to cover the other players cards
-        var view = inflater.inflate(R.layout.new_player_dialog, null)
+//        var inflater = LayoutInflater.from(requireContext())
+//        // TODO: rethink the size of inflated message - too small to cover the other players cards
+//        var view = inflater.inflate(R.layout.new_player_dialog, null)
 
-        var newPlayerDialog = AlertDialog.Builder(requireContext())
-        var title = players[currentPlayerNum].getName() + " will play its turn!"
-        newPlayerDialog.setTitle(title)
-        newPlayerDialog.setView(view)
+        val newPlayerDialog = AlertDialog.Builder(requireContext())
+        val message = players[currentPlayerNum].getName() + " will play its turn!"
+        //newPlayerDialog.setTitle(title)
+        newPlayerDialog.setMessage(message)
         newPlayerDialog.setCancelable(false)
         newPlayerDialog.setPositiveButton("I'm ready!",
             DialogInterface.OnClickListener { dialogInterface, i ->
                 cardAdapter!!.notifyDataSetChanged()
-                // TODO: change view of new current players tile
                 updatePlayerInfo()
 
                 // dismiss curtain and set a cute border with gradient
-                binding.onTopOfCardsGuard!!.background = resources.getDrawable(R.drawable.empty_drawable)
+                binding.onTopOfCardsGuard!!.background = ResourcesCompat.getDrawable(resources, R.drawable.empty_drawable, null)
                 binding.cardListView!!.bringToFront()
+
+                if(cardManager.currentPenalty.enabled()){
+                    // TODO: display penalty ALERT DIALOG for the new player
+                    penaltyCheckerAlertDialog()
+                }
             })
         newPlayerDialog.create().show()
     }
@@ -159,11 +164,11 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     override fun onItemClick(position: Int, view: View) {
         Log.i("Card_click", "card_${position}")
 
-        players[currentPlayerNum]
         players[currentPlayerNum].selectedCard(position)
 
         playCardsButtonUpdate()
-        cardAdapter!!.notifyDataSetChanged()
+        cardAdapter!!.notifyItemChanged(position)
+        //cardAdapter!!.notifyDataSetChanged()
     }
 
     override fun onItemLongClick(position: Int, view: View) {
@@ -171,21 +176,39 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         players[currentPlayerNum].selectedCardLong(position)
 
         playCardsButtonUpdate()
-        cardAdapter!!.notifyDataSetChanged()
+        cardAdapter!!.notifyItemChanged(position)
+        //cardAdapter!!.notifyDataSetChanged()
     }
 
     //////////////////////// playing cards ///////////////////////
 
-    private fun drawCards(){
-        cardManager.drawCardFromStack(players[currentPlayerNum].getCards(), cardAdapter!!)
-        players[currentPlayerNum].resetSelectedCards()
-        //newPlayerAlert()
-        updatePlayerInfo()
+    // INFO: probably DONE
+    private fun drawCards(numToDraw: Int = 1, fromPenalty: Boolean = false) {
+        for(i in 1..numToDraw)
+            cardManager.drawCardFromStack(players[currentPlayerNum].getCards(), cardAdapter!!)
+
+        if (fromPenalty) {
+            cardManager.currentPenalty.drawSum--
+            drawCardPenaltyAlertDialog()
+        } else {
+            if(players[currentPlayerNum].getCards().last() == cardManager.displayedCard)
+                drawCardRegularAlertDialog()
+            else {
+                players[currentPlayerNum].resetSelectedCards()
+                cardManager.currentPenalty.reset()
+                newPlayerAlert()
+                updatePlayerInfo()
+            }
+        }
     }
 
     private fun playCards(){
+        if(cardManager.currentPenalty.enabled()){
+
+        }
+
         if(players[currentPlayerNum].playCards(binding.displayedCard, binding.currentCardName!!)) {      // if cards played were good - proceed to the next player
-            //newPlayerAlert()            // set alert about new players turn
+            newPlayerAlert()            // set alert about new players turn
             playCardsButtonUpdate()
         }
 
@@ -202,14 +225,6 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun checkForPenalties(){
-        if(penaltyArise){
-
-        }else{
-
-        }
     }
 
     // TODO: card game logic
@@ -232,41 +247,169 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
 
     ///////////////////////////////////
     // TODO: PENALTIES
-    private fun penaltyCheckerAlertDialog(cardOnStack: CardItem, playerCards: ArrayList<CardItem>){
-        val alert = AlertDialog.Builder(requireContext())
+    private fun penaltyCheckerAlertDialog(){
+        val penaltyDialog = AlertDialog.Builder(requireContext())
 
-        var cardFound: Boolean = false
+        var message = "You are forced to "
+        var posButtonMess = ""
+        var negButtonMess = "Draw cards"
 
-        // check for 2s
-        if(cardOnStack.wasCardPlayed()){
-             cardManager.displayedCard.resetCardPlayed()
-            binding.drawCardButton!!.text = "Draw a card"
-            penalty = 0
-        }
-        else {
-            for (it in playerCards) {
-                if (it.getCardValue() == CardValue.two && cardOnStack.getCardValue() == CardValue.two) {
-                    Log.i("PLACE", "Found card - 2")
-                    cardFound = true
-                    break
+        var canRevenge = false
+        var needsContinue = false
+
+        when(cardManager.currentPenalty.type){
+            Penalty.PenaltyType.draw -> {
+                message += "draw ${cardManager.currentPenalty.drawSum} cards"
+
+                for(card in players[currentPlayerNum].getCards()){      // if current player has revenge card
+                    if(cardManager.displayedCard.getCardValue() == CardValue.three){
+                        if(card.getCardValue() == CardValue.three
+                            || card.getCardValue() == CardValue.two && card.getCardType() == cardManager.displayedCard.getCardType()){
+                            canRevenge = true
+                            break
+                        }
+                    } else if(cardManager.displayedCard.getCardValue() == CardValue.two){
+                        if(card.getCardValue() == CardValue.two
+                            || card.getCardValue() == CardValue.three && card.getCardType() == cardManager.displayedCard.getCardType()){
+                            canRevenge = true
+                            break
+                        }
+                    } else if(cardManager.displayedCard.getCardValue() == CardValue.king
+                        && cardManager.displayedCard.getCardType() == HouseType.Hearts){
+                        if(card.getCardValue() == CardValue.king && card.getCardType() == HouseType.Spades){
+                            canRevenge = true
+                            // INFO: when playing THIS card - don't forget to set: currentPlayerNum--
+                            break
+                        }
+                    }
                 }
             }
-        }
-
-        if(cardFound) {
-            penalty = penalty + 2
-            // set an alert that there is an option to revenge..., or just draw cards
-            alert.setMessage("You can play a 2 against the other 2 or draw $penalty cards.")
-            alert.setPositiveButton(
-                "I understand"
-            ) { dialogInterface, i ->
-
+            Penalty.PenaltyType.drawBack -> {
+                // TODO: check if drawBack
             }
-            alert.create().show()
+            Penalty.PenaltyType.demandFigure -> {
+                message += "play ${cardManager.currentPenalty.demandedFigure}s"
 
-            binding.drawCardButton!!.text = "Draw $penalty cards"
+                for(card in players[currentPlayerNum].getCards()){      // if current player has revenge card
+                    if(card.getCardValue() == cardManager.currentPenalty.getDemandedFigure()){
+                        canRevenge = true
+                        break
+                    }
+                }
+            }
+            Penalty.PenaltyType.demandHouse -> {
+                message += "play a card from house of ${cardManager.currentPenalty.demandedHouse}"
+
+                for(card in players[currentPlayerNum].getCards()){      // if current player has revenge card
+                    if(card.getCardType() == cardManager.currentPenalty.getDemandedHouse()){
+                        canRevenge = true
+                        break
+                    }
+                }
+            }
+            Penalty.PenaltyType.stop -> {
+                message += "stop for ${cardManager.currentPenalty.numOfRounds} round/s"
+                negButtonMess = "Wait ${cardManager.currentPenalty.numOfRounds} round/s"
+                for(card in players[currentPlayerNum].getCards()){
+                    if(card.getCardValue() == CardValue.four){
+                        canRevenge = true
+                        break
+                    }else{
+                        needsContinue = true
+                        break
+                    }
+                }
+            }
+            else -> message = "ERROR"
         }
 
+        penaltyDialog.setMessage(message)
+        penaltyDialog.setCancelable(false)
+
+        if(canRevenge){
+            posButtonMess = "Play in revenge"
+            penaltyDialog.setPositiveButton(posButtonMess,
+                DialogInterface.OnClickListener{ dialogInterface, i ->
+                    //TODO: On REVENGE click - allow player to choose from his cards
+
+                // returns to the cardList screen
+                })
+        }
+
+        penaltyDialog.setNegativeButton(negButtonMess,
+            DialogInterface.OnClickListener{ dialogInterface, i ->
+                if(needsContinue){
+
+                }else {
+                    drawCards(fromPenalty = true)
+                }
+            })
+
+        penaltyDialog.create().show()
+    }
+
+    /**
+     * Informs about the first card that was drawed from the stack
+     * and possible options what to do with that.
+     * **/
+    private fun drawCardPenaltyAlertDialog(){
+
+        val dialogBuilder = AlertDialog.Builder(requireContext())
+        val drawedCard = players[currentPlayerNum].getCards().last()
+        dialogBuilder.setTitle("You drawed ${drawedCard.getCardValueName()} of ${drawedCard.getCardType()}")
+
+        val message = when(cardManager.currentPenalty.check(drawedCard, cardManager.displayedCard)){
+            true -> "It's a match!"
+            false -> "This card doesn't match the demand."
+        }
+
+        var negButtonMessage = when(cardManager.currentPenalty.type){
+            Penalty.PenaltyType.draw -> "Save and draw the rest"
+            else -> "Save and exit"
+        }
+
+        dialogBuilder.setCancelable(false)
+        dialogBuilder.setMessage(message)
+        dialogBuilder.setPositiveButton("Play this card",
+            DialogInterface.OnClickListener{ dialogInterface, i ->
+                // play the last card
+                players[currentPlayerNum].resetSelectedCards()
+                players[currentPlayerNum].selectedCard(players[currentPlayerNum].getCards().size-1)
+                playCards()
+            })
+        dialogBuilder.setNegativeButton(negButtonMessage,
+            DialogInterface.OnClickListener { dialogInterface, i ->
+                cardManager.currentPenalty.reset()
+                drawCards(cardManager.currentPenalty.drawSum)
+            })
+
+        val alert = dialogBuilder.create().show()
+    }
+
+    private fun drawCardRegularAlertDialog(){
+        val dialogBuilder = AlertDialog.Builder(requireContext())
+        val drawedCard = players[currentPlayerNum].getCards().last()
+        dialogBuilder.setTitle("You drawed ${drawedCard.getCardValueName()} of ${drawedCard.getCardType()}")
+
+        val message = "It's a match! What would you like to do?"
+        val posButtonMess = "Play it"
+        val negButtonMess = "Keep it"
+
+        dialogBuilder.setCancelable(false)
+        dialogBuilder.setMessage(message)
+        dialogBuilder.setPositiveButton(posButtonMess,
+            DialogInterface.OnClickListener { dialogInterface, i ->
+                players[currentPlayerNum].resetSelectedCards()
+                players[currentPlayerNum].selectedCard(players[currentPlayerNum].getCards().size-1)
+                playCards()
+            })
+        dialogBuilder.setNegativeButton(negButtonMess,
+            DialogInterface.OnClickListener { dialogInterface, i ->
+                players[currentPlayerNum].resetSelectedCards()
+                cardManager.currentPenalty.reset()
+                newPlayerAlert()
+                updatePlayerInfo()
+            })
     }
 
     ////////////////////////////////////////////////

@@ -106,24 +106,22 @@ class CardManager(val context: Context){
             cardsChosen.add(playerCards[it])
         }
 
-        // if there is no penalty set
-        if(currentPenalty.type.equals(Penalty.PenaltyType.none)) {
-            if(checkIfActionCards(cardsChosen)){    // if played cards are action cards
-                //TODO: set penalty
-                defineActionCards(cardsChosen)
-                //TODO: manageCards()
-            } else{                                 // if played cards are regular cards
-                //TODO: manageCards()
-            }
-        } else if(currentPenalty.type.equals(Penalty.PenaltyType.draw)){
-            if(checkIfActionCards(playerCards)){
-                //TODO: action cards
-            }
-        }
+//        // if there is no penalty set
+//        if(currentPenalty.type.equals(Penalty.PenaltyType.none)) {
+//            if(checkIfActionCards(cardsChosen)){    // if played cards are action cards
+//                //TODO: set penalty
+//                defineActionCards(cardsChosen)
+//                //TODO: manageCards()
+//            } else{                                 // if played cards are regular cards
+//                //TODO: manageCards()
+//            }
+//        } else if(currentPenalty.type.equals(Penalty.PenaltyType.draw)){
+//            if(checkIfActionCards(playerCards)){
+//                //TODO: action cards
+//            }
+//        }
 
-        ///////////////////////////// manageCards()
-
-
+        //////////////// MANAGES CARDS in hand & displayed ////////////////
 
         // set card ON TOP as a displayedCard
         for(card in cardsChosen){

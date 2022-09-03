@@ -48,12 +48,8 @@ class Penalty(){
     }
 
     fun setDemandFigure(figure: CardValue = CardValue.none){
+        reset()
         type = PenaltyType.demandFigure
-
-        drawSum = 0
-        demandedHouse = DemandHouse.none
-        numOfRounds = 0
-
         demandedFigure = when(figure){
             CardValue.five -> DemandFigure.Five
             CardValue.six -> DemandFigure.Six
@@ -69,10 +65,10 @@ class Penalty(){
     fun setHaltPlayer(quantity: Int = 0){
         type = PenaltyType.stop
         numOfRounds += quantity
+        drawSum = 1
 
         demandedFigure = DemandFigure.none
         demandedHouse = DemandHouse.none
-        drawSum = 0
     }
 
     fun setDrawCards(value: Int = 2, quantity: Int = 0){
@@ -99,6 +95,63 @@ class Penalty(){
         else{
             throw Exception("ERROR: cannot add draw penalty when in different penalty state!")
         }
+    }
+
+    fun enabled(): Boolean{
+        if(type == PenaltyType.none)
+            return false
+        return true
+    }
+
+    fun getDemandedFigure(): CardValue{
+        when(demandedFigure){
+            DemandFigure.Five -> return CardValue.five
+            DemandFigure.Six -> return CardValue.six
+            DemandFigure.Seven -> return CardValue.seven
+            DemandFigure.Eight -> return CardValue.eight
+            DemandFigure.Nine -> return CardValue.nine
+            DemandFigure.Ten -> return CardValue.ten
+            DemandFigure.Queen -> return CardValue.queen
+            else -> return CardValue.none
+        }
+    }
+
+    fun getDemandedHouse(): HouseType{
+        when(demandedHouse){
+            DemandHouse.Hearts -> return HouseType.Hearts
+            DemandHouse.Spades -> return HouseType.Spades
+            DemandHouse.Diamonds -> return HouseType.Diamonds
+            DemandHouse.Clubs -> return HouseType.Clubs
+            else -> return HouseType.none
+        }
+    }
+
+    fun check(card: CardItem, onStack: CardItem): Boolean{
+        when(type){
+            PenaltyType.draw -> {
+                // TODO: not done for kings
+                if(onStack.getCardValue() == card.getCardValue())
+                    return true
+                else if(onStack.getCardType() == card.getCardType()){
+                    if(onStack.getCardValue() == CardValue.three
+                        && card.getCardValue() == CardValue.two
+                        || onStack.getCardValue() == CardValue.two
+                        && card.getCardValue() == CardValue.three)
+                        return true
+                }
+            }
+            PenaltyType.demandHouse -> {
+                if(getDemandedHouse() == card.getCardType())
+                    return true
+            }
+            PenaltyType.demandFigure -> {
+                if(getDemandedFigure() == card.getCardValue())
+                    return true
+            }
+            else -> return false
+        }
+
+        return false
     }
 
 }
