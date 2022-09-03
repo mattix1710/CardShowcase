@@ -70,7 +70,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         super.onViewCreated(view, savedInstanceState)
 
         // set initial resources
-        cardManager = CardManager(requireContext())
+        cardManager = CardManager(requireContext(), binding.currentPenaltyInfo!!)
 
 //        binding.buttonFirst.setOnClickListener {
 //            findNavController().navigate(R.id.action_GameLocalMultiplayer_to_MainFragment)
@@ -437,7 +437,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
             .setNeutralButton(R.string.demand_figure_cancel){
                     dialog, which ->
                 // Returns Jack as a regular card
-                cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.none
+                cardManager.currentPenalty.reset()
                 playCardsUpdate()
             }
             .setPositiveButton(R.string.demand_figure_ok){ dialog, which ->
@@ -452,6 +452,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                     6 -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.Queen
                     else -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.none
                 }
+                cardManager.currentPenalty.setPenalty(arrayListOf(cardManager.displayedCard))
                 playCardsUpdate()
             }
             .setSingleChoiceItems(singleItems, checkedItem){ dialog, which ->
@@ -473,7 +474,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
             .setTitle(R.string.demand_house_message)
             .setNeutralButton(R.string.demand_house_cancel){ dialog, which ->
                 // Returns Ace as a regular card
-                cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.none
+                cardManager.currentPenalty.reset()
                 playCardsUpdate()
             }
             .setPositiveButton(R.string.demand_house_ok){ dialog, which ->
@@ -485,6 +486,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                     3 -> cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.Diamonds
                     else -> cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.none
                 }
+                cardManager.currentPenalty.setPenalty(arrayListOf(cardManager.displayedCard))
                 playCardsUpdate()
             }
             .setSingleChoiceItems(singleItems, checkedItem){ dialog, which ->

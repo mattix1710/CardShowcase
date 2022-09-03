@@ -1,10 +1,15 @@
 package com.example.cardshowcase.cardsHandling
 
+import android.content.Context
+import android.content.res.Resources
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import com.example.cardshowcase.R
 import java.lang.Error
 import java.lang.Exception
 
-class Penalty(){
+class Penalty(val context: Context, val penaltyInfo: TextView){
 
     var type: PenaltyType = PenaltyType.none
     var drawSum: Int = 0
@@ -30,6 +35,8 @@ class Penalty(){
         numOfRounds = 0
         demandedHouse = DemandHouse.none
         demandedFigure = DemandFigure.none
+        penaltyInfo.setText("-")
+        penaltyInfo.setTextColor(ContextCompat.getColor(context, R.color.penalty_none))
     }
 
     fun setDemandHouse(house: HouseType = HouseType.none){
@@ -193,10 +200,11 @@ class Penalty(){
     }
 
     // TODO: set PENALTY for newly added cards
-    fun setPenalty(cards: ArrayList<CardItem>, penaltyInfo: TextView){
+    fun setPenalty(cards: ArrayList<CardItem>){
         var quantity = cards.size
         var value = cards[0].getCardValue()
         //var onTop = for(card in cards)
+        penaltyInfo.setTextColor(ContextCompat.getColor(context, R.color.penalty_current))
 
         when(value){
             CardValue.two -> {
@@ -212,11 +220,12 @@ class Penalty(){
                 penaltyInfo.setText("Wait for ${quantity.toString()} round/s")
             }
             CardValue.jack -> {
-                setDemandFigure()
-                //penaltyInfo.setText("Play ${demandedFigure}s")
+                //setDemandFigure()
+                penaltyInfo.setText("Play ${demandedFigure}s")
             }
             CardValue.queen -> {
                 reset()
+                penaltyInfo.setTextColor(ContextCompat.getColor(context, R.color.penalty_none))
             }
             CardValue.king -> {
                 for(card in cards){

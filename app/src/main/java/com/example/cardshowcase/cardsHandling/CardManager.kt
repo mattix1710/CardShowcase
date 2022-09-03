@@ -14,13 +14,13 @@ enum class DemandedTypeSelector{
     none, Jack, Ace, wrongCards
 }
 
-class CardManager(val context: Context){
+class CardManager(val context: Context, val penaltyInfo: TextView){
 
     var allPlayingCards  = ArrayList<CardItem>()
     var currentFreeCards = ArrayList<CardItem>()
     var usedPlayingCards = ArrayList<CardItem>()
     var displayedCard    = CardItem(R.drawable.card_empty)
-    var currentPenalty: Penalty = Penalty()
+    var currentPenalty: Penalty = Penalty(context, penaltyInfo)
 
     var queenFunctional: Boolean = false
     var allowsPairToPlay: Boolean = true
@@ -70,10 +70,7 @@ class CardManager(val context: Context){
         var value: String = displayedCard.getCardValueName()
         var house: String = displayedCard.getCardType().toString()
 
-        if(displayedCard.getCardValue() == CardValue.two && !wasFirst)
-            currentCard.setTextColor(context.resources.getColor(R.color.current_card_functional_info))
-        else
-            currentCard.setTextColor(context.resources.getColor(R.color.current_card_info))
+        currentCard.setTextColor(context.resources.getColor(R.color.current_card_info))
 
         currentCard.text = "$value of $house"
     }
@@ -152,7 +149,7 @@ class CardManager(val context: Context){
                     } else if (card.getCardValue() == CardValue.ace) {
                         demandedType = DemandedTypeSelector.Ace//demandedHouseAlertDialog()
                     } else {
-                        currentPenalty.setPenalty(cardsChosen, penaltyInfo)
+                        currentPenalty.setPenalty(cardsChosen)
                         break
                     }
                 }
