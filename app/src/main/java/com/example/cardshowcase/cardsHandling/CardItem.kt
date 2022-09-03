@@ -95,4 +95,8 @@ class CardItem {
     fun isFunctional(): Boolean{
         return this.isFunctional
     }
+
+    fun setFunctional(){
+        isFunctional = true
+    }
 }

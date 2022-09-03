@@ -33,4 +33,13 @@ class Player(playerName: String, playerNumber: Int, context: Context, cardManage
     fun getCards(): ArrayList<CardItem>{
         return playerCards
     }
+
+    fun setHaltRoundsPenalty(quantity: Int){
+        awaitingRoundsPenalty = quantity
+    }
+
+    fun decreaseRoundsPenalty(){
+        if(awaitingRoundsPenalty > 1)
+            awaitingRoundsPenalty--
+    }
 }

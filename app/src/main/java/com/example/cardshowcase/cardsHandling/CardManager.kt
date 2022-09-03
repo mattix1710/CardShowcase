@@ -6,8 +6,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.widget.*
 import com.example.cardshowcase.R
+import com.example.cardshowcase.playerHandling.PlayersCards
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.w3c.dom.Text
 
+enum class DemandedTypeSelector{
+    none, Jack, Ace, wrongCards
+}
 
 class CardManager(val context: Context){
 
@@ -18,10 +23,24 @@ class CardManager(val context: Context){
     var currentPenalty: Penalty = Penalty()
 
     var queenFunctional: Boolean = false
+    var allowsPairToPlay: Boolean = true
 
     init {
         populateCardDeck()
+
+        enableModifiers()
+
         allPlayingCards = currentFreeCards.clone() as ArrayList<CardItem>
+    }
+
+    private fun enableModifiers(){
+        if(queenFunctional){
+            for(card in currentFreeCards){
+                if(card.getCardValue() == CardValue.queen){
+                    card.setFunctional()
+                }
+            }
+        }
     }
 
     private fun randomizer(minSize: Int, maxSize: Int, includesMax: Boolean = false): Int{
@@ -94,8 +113,92 @@ class CardManager(val context: Context){
      * - sets current on top card as displayed card
      * - removes cards from the players hand
      * - manages used cards
+     * - sets the penalty if action cards played
      * **/
-    fun managePlayingCards(selectedCards: ArrayList<Int>,
+    // TODO: manage cards when penalty enabled
+    fun managePlayingCards(cardsChosen: ArrayList<CardItem>,
+                           playerCards: ArrayList<CardItem>,
+                           displayedImg: ImageView,
+                           displayedInfo: TextView,
+                           penaltyInfo: TextView): DemandedTypeSelector{
+
+        var demandedType = DemandedTypeSelector.none
+//        val cardsChosen = ArrayList<CardItem>()
+//        for(it in selectedCards) cardsChosen.add(playerCards[it])
+
+        if(currentPenalty.enabled()){   // if penalty is already set
+            // add cards to used stack and set displayed card
+            for (card in cardsChosen) {
+                if (card.isFunctional() && card.isSelectedOnTop()) {
+                    if (card.getCardValue() == CardValue.jack) {
+                        demandedType = DemandedTypeSelector.Jack//demandedFigureAlertDialog()
+                    } else if (card.getCardValue() == CardValue.ace) {
+                        demandedType = DemandedTypeSelector.Ace//demandedHouseAlertDialog()
+                    } else {
+                        // update penalty INFO
+                        currentPenalty.updatePenalty(cardsChosen, penaltyInfo)
+                        break
+                    }
+                }
+            }
+            manageUsedCards(cardsChosen, playerCards, displayedImg, displayedInfo, penaltyInfo)
+
+        } else {
+            // check if selected cards are functional
+            for (card in cardsChosen) {
+                if (card.isFunctional() && card.isSelectedOnTop()) {
+                    if (card.getCardValue() == CardValue.jack) {
+                        demandedType = DemandedTypeSelector.Jack//demandedFigureAlertDialog()
+                    } else if (card.getCardValue() == CardValue.ace) {
+                        demandedType = DemandedTypeSelector.Ace//demandedHouseAlertDialog()
+                    } else {
+                        currentPenalty.setPenalty(cardsChosen, penaltyInfo)
+                        break
+                    }
+                }
+            }
+
+            manageUsedCards(cardsChosen, playerCards, displayedImg, displayedInfo, penaltyInfo)
+        }
+
+        return demandedType
+    }
+
+    fun manageUsedCards(cardsChosen: ArrayList<CardItem>, playerCards: ArrayList<CardItem>,
+                        displayedImg: ImageView, displayedInfo: TextView, penaltyInfo: TextView){
+        // set card ON TOP as a displayedCard
+        for (card in cardsChosen) {
+            if (card.isSelectedOnTop()) {
+                usedPlayingCards.add(displayedCard)
+                card.resetSelected()
+                displayedCard = card
+                displayedImg.setImageResource(displayedCard.getCardId())
+                playerCards.remove(card)
+                cardsChosen.remove(card)
+                break
+            }
+        }
+
+        // for the rest of the cards
+        for (card in cardsChosen) {
+            card.resetSelected()
+            usedPlayingCards.add(card)
+            playerCards.remove(card)
+        }
+
+        setCurrentCardInfo(displayedInfo)
+        penaltyInfo.text = "-"
+    }
+
+
+
+
+    /** function used to play chosen cards
+     * - sets current on top card as displayed card
+     * - removes cards from the players hand
+     * - manages used cards
+     * **/
+    fun managePlayingCards1(selectedCards: ArrayList<Int>,
                            playerCards: ArrayList<CardItem>,
                            displayedImg: ImageView,
                            displayedInfo: TextView){
@@ -159,40 +262,41 @@ class CardManager(val context: Context){
         return false
     }
 
-    private fun defineActionCards(cards: ArrayList<CardItem>){
-        // all cards chosen are of the same figure, so we have to check only the last one in the array
-        // last -> it will decide about the penalty of some cards (i.e. king of spades, king od hearts)
-        var currentCard: CardItem? = null
-
-        for(card in cards){
-            if(card.isSelectedOnTop())
-                currentCard = card
-        }
-
-        when(currentCard!!.getCardValue()){
-            CardValue.two -> currentPenalty.setDrawCards(2, cards.size)
-            CardValue.three -> currentPenalty.setDrawCards(3, cards.size)
-            CardValue.four -> currentPenalty.setHaltPlayer(cards.size)
-            CardValue.queen -> currentPenalty.reset()
-            CardValue.jack -> {
-            //TODO: demand figure AlertDialog
-                demandedFigureAlertDialog()
-            }
-            CardValue.king -> {
-                if(currentCard!!.getCardType() == HouseType.Spades){
-                    // TODO: rethink
-                    currentPenalty.setDrawBackCards(-5)
-                } else if(currentCard!!.getCardType() == HouseType.Hearts){
-                    currentPenalty.setDrawCards(5, 1)
-                }
-            }
-            CardValue.ace -> {
-                //TODO: demand house AlertDialog
-                demandedHouseAlertDialog()
-            }
-            else -> Log.i("ACTION CARDS", "Wrong cards are selected as action cards!")
-        }
-    }
+    // TODO: remove?
+//    private fun defineActionCards(cards: ArrayList<CardItem>){
+//        // all cards chosen are of the same figure, so we have to check only the last one in the array
+//        // last -> it will decide about the penalty of some cards (i.e. king of spades, king od hearts)
+//        var currentCard: CardItem? = null
+//
+//        for(card in cards){
+//            if(card.isSelectedOnTop())
+//                currentCard = card
+//        }
+//
+//        when(currentCard!!.getCardValue()){
+//            CardValue.two -> currentPenalty.setDrawCards(2, cards.size)
+//            CardValue.three -> currentPenalty.setDrawCards(3, cards.size)
+//            CardValue.four -> currentPenalty.setHaltPlayer(cards.size)
+//            CardValue.queen -> currentPenalty.reset()
+//            CardValue.jack -> {
+//            //TODO: demand figure AlertDialog
+//                demandedFigureAlertDialog()
+//            }
+//            CardValue.king -> {
+//                if(currentCard!!.getCardType() == HouseType.Spades){
+//                    // TODO: rethink
+//                    currentPenalty.setDrawBackCards(-5)
+//                } else if(currentCard!!.getCardType() == HouseType.Hearts){
+//                    currentPenalty.setDrawCards(5, 1)
+//                }
+//            }
+//            CardValue.ace -> {
+//                //TODO: demand house AlertDialog
+//                demandedHouseAlertDialog()
+//            }
+//            else -> Log.i("ACTION CARDS", "Wrong cards are selected as action cards!")
+//        }
+//    }
 
     fun drawCardFromStack(playerCards: ArrayList<CardItem>,
                           cardAdapter: CardAdapter){
@@ -208,71 +312,6 @@ class CardManager(val context: Context){
 
         cardAdapter.notifyDataSetChanged()
     }
-
-    private fun demandedFigureAlertDialog(){
-        var singleItems = arrayOf("5", "6", "7", "8", "9", "10")
-        if(queenFunctional)
-            singleItems.plus("Queen")
-        var checkedItem = 0
-
-        MaterialAlertDialogBuilder(context)
-            .setTitle(R.string.demand_figure_message)
-            .setNeutralButton(R.string.demand_figure_cancel){
-                dialog, which ->
-                // Returns Jack as a regular card
-                currentPenalty.demandedFigure = Penalty.DemandFigure.none
-            }
-            .setPositiveButton(R.string.demand_figure_ok){ dialog, which ->
-                // Accept current choice
-                when(checkedItem){
-                    0 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Five
-                    1 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Six
-                    2 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Seven
-                    3 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Eight
-                    4 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Nine
-                    5 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Ten
-                    6 -> currentPenalty.demandedFigure = Penalty.DemandFigure.Queen
-                    else -> currentPenalty.demandedFigure = Penalty.DemandFigure.none
-                }
-            }
-            .setSingleChoiceItems(singleItems, checkedItem){ dialog, which ->
-                Log.i("DEMAND", which.toString())
-                checkedItem = which
-            }
-            .setCancelable(false)
-            .show()
-    }
-
-    private fun demandedHouseAlertDialog(){
-        val singleItems = arrayOf(context.resources.getString(R.string.heart_emoji),
-                        context.resources.getString(R.string.clubs_emoji),
-                        context.resources.getString(R.string.spades_emoji),
-                        context.resources.getString(R.string.diamond_emoji))
-        var checkedItem = 0
-
-        MaterialAlertDialogBuilder(context)
-            .setTitle(R.string.demand_house_message)
-            .setNeutralButton(R.string.demand_house_cancel){ dialog, which ->
-                // Returns Ace as a regular card
-                currentPenalty.demandedHouse = Penalty.DemandHouse.none
-            }
-            .setPositiveButton(R.string.demand_house_ok){ dialog, which ->
-                // Accept current choice
-                when(checkedItem){
-                    0 -> currentPenalty.demandedHouse = Penalty.DemandHouse.Hearts
-                    1 -> currentPenalty.demandedHouse = Penalty.DemandHouse.Clubs
-                    2 -> currentPenalty.demandedHouse = Penalty.DemandHouse.Spades
-                    3 -> currentPenalty.demandedHouse = Penalty.DemandHouse.Diamonds
-                    else -> currentPenalty.demandedHouse = Penalty.DemandHouse.none
-                }
-            }
-            .setSingleChoiceItems(singleItems, checkedItem){ dialog, which ->
-                checkedItem = which
-            }
-            .setCancelable(false)
-            .show()
-    }
-
     private fun populateCardDeck() {
 
         // TREFLE
@@ -300,7 +339,7 @@ class CardManager(val context: Context){
         currentFreeCards.add(CardItem(R.drawable.card_diamonds_09, HouseType.Diamonds, CardValue.nine))
         currentFreeCards.add(CardItem(R.drawable.card_diamonds_10, HouseType.Diamonds, CardValue.ten))
         currentFreeCards.add(CardItem(R.drawable.card_diamonds_j, HouseType.Diamonds, CardValue.jack, true))
-        currentFreeCards.add(CardItem(R.drawable.card_diamonds_q, HouseType.Diamonds, CardValue.queen, true))
+        currentFreeCards.add(CardItem(R.drawable.card_diamonds_q, HouseType.Diamonds, CardValue.queen))
         currentFreeCards.add(CardItem(R.drawable.card_diamonds_k, HouseType.Diamonds, CardValue.king))
         currentFreeCards.add(CardItem(R.drawable.card_diamonds_a, HouseType.Diamonds, CardValue.ace, true))
         // spadesI
@@ -314,7 +353,7 @@ class CardManager(val context: Context){
         currentFreeCards.add(CardItem(R.drawable.card_spades_09, HouseType.Spades, CardValue.nine))
         currentFreeCards.add(CardItem(R.drawable.card_spades_10, HouseType.Spades, CardValue.ten))
         currentFreeCards.add(CardItem(R.drawable.card_spades_j, HouseType.Spades, CardValue.jack, true))
-        currentFreeCards.add(CardItem(R.drawable.card_spades_q, HouseType.Spades, CardValue.queen, true))
+        currentFreeCards.add(CardItem(R.drawable.card_spades_q, HouseType.Spades, CardValue.queen))
         currentFreeCards.add(CardItem(R.drawable.card_spades_k, HouseType.Spades, CardValue.king, true))
         currentFreeCards.add(CardItem(R.drawable.card_spades_a, HouseType.Spades, CardValue.ace, true))
         // KIERY
@@ -328,7 +367,7 @@ class CardManager(val context: Context){
         currentFreeCards.add(CardItem(R.drawable.card_hearts_09, HouseType.Hearts, CardValue.nine))
         currentFreeCards.add(CardItem(R.drawable.card_hearts_10, HouseType.Hearts, CardValue.ten))
         currentFreeCards.add(CardItem(R.drawable.card_hearts_j, HouseType.Hearts, CardValue.jack, true))
-        currentFreeCards.add(CardItem(R.drawable.card_hearts_q, HouseType.Hearts, CardValue.queen, true))
+        currentFreeCards.add(CardItem(R.drawable.card_hearts_q, HouseType.Hearts, CardValue.queen))
         currentFreeCards.add(CardItem(R.drawable.card_hearts_k, HouseType.Hearts, CardValue.king, true))
         currentFreeCards.add(CardItem(R.drawable.card_hearts_a, HouseType.Hearts, CardValue.ace, true))
 //        // JOKERY
@@ -337,7 +376,7 @@ class CardManager(val context: Context){
     }
 }
 
-val cardsIds = arrayOf<Int>(
+    val cardsIds = arrayOf<Int>(
     R.drawable.card_hearts_a,
     R.drawable.card_hearts_02,
     R.drawable.card_hearts_03,

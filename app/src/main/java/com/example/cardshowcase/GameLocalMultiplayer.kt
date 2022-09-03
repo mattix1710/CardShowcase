@@ -17,6 +17,7 @@ import com.example.cardshowcase.cardsHandling.*
 import com.example.cardshowcase.databinding.GameLocalMultiplayerBinding
 import com.example.cardshowcase.playerHandling.Player
 import com.google.android.flexbox.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.w3c.dom.Text
 
 
@@ -43,7 +44,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     //////////////////////////////////////////////
     // private player card info
     //
-    private var currentPlayerNum: Int = 0
+    private var currentPlayerNum: Int = 2
     private var players = ArrayList<Player>()
     private var playerCardNum = ArrayList<TextView>()
     private var playerCardTile = ArrayList<CardView>()
@@ -167,8 +168,8 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         players[currentPlayerNum].selectedCard(position)
 
         playCardsButtonUpdate()
-        cardAdapter!!.notifyItemChanged(position)
-        //cardAdapter!!.notifyDataSetChanged()
+        // cannot use .notifyItemChanged - because we don't have an exact information, which other cards could be selected
+        cardAdapter!!.notifyDataSetChanged()
     }
 
     override fun onItemLongClick(position: Int, view: View) {
@@ -176,8 +177,8 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         players[currentPlayerNum].selectedCardLong(position)
 
         playCardsButtonUpdate()
-        cardAdapter!!.notifyItemChanged(position)
-        //cardAdapter!!.notifyDataSetChanged()
+        // cannot use .notifyItemChanged - because we don't have an exact information, which other cards could be selected
+        cardAdapter!!.notifyDataSetChanged()
     }
 
     //////////////////////// playing cards ///////////////////////
@@ -203,15 +204,36 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     }
 
     private fun playCards(){
-        if(cardManager.currentPenalty.enabled()){
-
+        when(players[currentPlayerNum].playCards(binding.displayedCard,
+            binding.currentCardName!!,
+            binding.currentPenaltyInfo!!)){
+            DemandedTypeSelector.Jack -> {
+                demandedFigureAlertDialog()
+            }
+            DemandedTypeSelector.Ace -> {
+                demandedHouseAlertDialog()
+            }
+            DemandedTypeSelector.wrongCards -> {
+                wrongCardAlertDialog()
+            }
+            else -> {
+                playCardsUpdate()
+            }
         }
+//        if(players[currentPlayerNum].playCards(binding.displayedCard,
+//                binding.currentCardName!!,
+//                binding.currentPenaltyInfo!!)) {      // if cards played were good - proceed to the next player
+//            newPlayerAlert()            // set alert about new players turn
+//            playCardsButtonUpdate()
+//        }
 
-        if(players[currentPlayerNum].playCards(binding.displayedCard, binding.currentCardName!!)) {      // if cards played were good - proceed to the next player
-            newPlayerAlert()            // set alert about new players turn
-            playCardsButtonUpdate()
-        }
+//        playCardsButtonUpdate()
+//        updatePlayerInfo()
+//        cardAdapter!!.notifyDataSetChanged()
+    }
 
+    private fun playCardsUpdate(){
+        newPlayerAlert()
         playCardsButtonUpdate()
         updatePlayerInfo()
         cardAdapter!!.notifyDataSetChanged()
@@ -225,24 +247,6 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    // TODO: card game logic
-    private fun cardGameLogic(card: CardItem, onStackCard: CardItem): Boolean {
-        // SIMPLE RULES
-        //
-        // 1. if there is an empty card (no cards on the table) - every card is allowed
-        // 2. if there is a joker - FOR NOW: every card is allowed <-- there should be a prompt which card you want to play
-        // 3. if player has a joker - can play for every card
-        // 4. if player has a regular card - he only can play on cards of the same house or same value
-        //
-        if(onStackCard.getCardType() == HouseType.none && onStackCard.getCardValue() == CardValue.none)
-            return true
-        else if(card.getCardType() == HouseType.Joker || onStackCard.getCardType() == HouseType.Joker)
-            return true
-        else if(card.getCardType() == onStackCard.getCardType() || card.getCardValue() == onStackCard.getCardValue())
-            return true
-        return false
     }
 
     ///////////////////////////////////
@@ -290,8 +294,10 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
             Penalty.PenaltyType.demandFigure -> {
                 message += "play ${cardManager.currentPenalty.demandedFigure}s"
 
-                for(card in players[currentPlayerNum].getCards()){      // if current player has revenge card
-                    if(card.getCardValue() == cardManager.currentPenalty.getDemandedFigure()){
+                for(card in players[currentPlayerNum].getCards()){
+                    // if current player has revenge card OR same action card
+                    if(card.getCardValue() == cardManager.currentPenalty.getDemandedFigure()
+                        || card.getCardValue() == CardValue.jack){
                         canRevenge = true
                         break
                     }
@@ -300,8 +306,10 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
             Penalty.PenaltyType.demandHouse -> {
                 message += "play a card from house of ${cardManager.currentPenalty.demandedHouse}"
 
-                for(card in players[currentPlayerNum].getCards()){      // if current player has revenge card
-                    if(card.getCardType() == cardManager.currentPenalty.getDemandedHouse()){
+                for(card in players[currentPlayerNum].getCards()){
+                    // if current player has revenge card OR same action card
+                    if(card.getCardType() == cardManager.currentPenalty.getDemandedHouse()
+                        || card.getCardValue() == CardValue.ace){
                         canRevenge = true
                         break
                     }
@@ -330,16 +338,20 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
             posButtonMess = "Play in revenge"
             penaltyDialog.setPositiveButton(posButtonMess,
                 DialogInterface.OnClickListener{ dialogInterface, i ->
-                    //TODO: On REVENGE click - allow player to choose from his cards
-
-                // returns to the cardList screen
+                    // returns to the cardList screen
+                    // allow player to choose from his cards
+                    players[currentPlayerNum].setRevenge()
                 })
         }
 
         penaltyDialog.setNegativeButton(negButtonMess,
             DialogInterface.OnClickListener{ dialogInterface, i ->
-                if(needsContinue){
-
+                if(needsContinue){  //if STOP CARD met (4)
+                    players[currentPlayerNum].setHaltRoundsPenalty(cardManager.currentPenalty.numOfRounds)
+                    cardManager.currentPenalty.reset()
+                    newPlayerAlert()
+                    updatePlayerInfo()
+                    playCardsButtonUpdate()
                 }else {
                     drawCards(fromPenalty = true)
                 }
@@ -375,11 +387,13 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                 // play the last card
                 players[currentPlayerNum].resetSelectedCards()
                 players[currentPlayerNum].selectedCard(players[currentPlayerNum].getCards().size-1)
+                players[currentPlayerNum].setRevenge()
                 playCards()
             })
         dialogBuilder.setNegativeButton(negButtonMessage,
             DialogInterface.OnClickListener { dialogInterface, i ->
                 cardManager.currentPenalty.reset()
+                players[currentPlayerNum].resetRevenge()
                 drawCards(cardManager.currentPenalty.drawSum)
             })
 
@@ -411,6 +425,90 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                 updatePlayerInfo()
             })
     }
+
+    private fun demandedFigureAlertDialog(){
+        var singleItems = arrayOf("5", "6", "7", "8", "9", "10")
+        if(cardManager.queenFunctional)
+            singleItems.plus("Queen")
+        var checkedItem = 0
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.demand_figure_message)
+            .setNeutralButton(R.string.demand_figure_cancel){
+                    dialog, which ->
+                // Returns Jack as a regular card
+                cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.none
+                playCardsUpdate()
+            }
+            .setPositiveButton(R.string.demand_figure_ok){ dialog, which ->
+                // Accept current choice
+                when(checkedItem){
+                    0 -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.Five
+                    1 -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.Six
+                    2 -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.Seven
+                    3 -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.Eight
+                    4 -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.Nine
+                    5 -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.Ten
+                    6 -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.Queen
+                    else -> cardManager.currentPenalty.demandedFigure = Penalty.DemandFigure.none
+                }
+                playCardsUpdate()
+            }
+            .setSingleChoiceItems(singleItems, checkedItem){ dialog, which ->
+                Log.i("DEMAND", which.toString())
+                checkedItem = which
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun demandedHouseAlertDialog(){
+        val singleItems = arrayOf(requireContext().resources.getString(R.string.heart_emoji),
+            requireContext().resources.getString(R.string.clubs_emoji),
+            requireContext().resources.getString(R.string.spades_emoji),
+            requireContext().resources.getString(R.string.diamond_emoji))
+        var checkedItem = 0
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.demand_house_message)
+            .setNeutralButton(R.string.demand_house_cancel){ dialog, which ->
+                // Returns Ace as a regular card
+                cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.none
+                playCardsUpdate()
+            }
+            .setPositiveButton(R.string.demand_house_ok){ dialog, which ->
+                // Accept current choice
+                when(checkedItem){
+                    0 -> cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.Hearts
+                    1 -> cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.Clubs
+                    2 -> cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.Spades
+                    3 -> cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.Diamonds
+                    else -> cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.none
+                }
+                playCardsUpdate()
+            }
+            .setSingleChoiceItems(singleItems, checkedItem){ dialog, which ->
+                checkedItem = which
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun wrongCardAlertDialog(){
+        val onTop = cardManager.displayedCard
+        var message = "Wrong cards were chosen to display!\n" +
+                "Try ${onTop.getCardValueName()}s or ${onTop.getCardType()}"
+
+        if(cardManager.currentPenalty.enabled()){
+            message = "Demanded cards are ${cardManager.currentPenalty.whatDemanded(onTop)}"
+        }
+
+        val alert = AlertDialog.Builder(requireContext())
+        alert.setMessage(message)
+        alert.setPositiveButton("Choose another card", null)
+        alert.create().show()
+    }
+
 
     ////////////////////////////////////////////////
     // OTHER updating functions
