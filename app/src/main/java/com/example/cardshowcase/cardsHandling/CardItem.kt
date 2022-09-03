@@ -14,14 +14,18 @@ class CardItem {
     private var cardID: Int = 0
     private var type: HouseType = HouseType.none
     private var value: CardValue = CardValue.none
-    private var wasPlayed: Boolean = false
+
+    private var isFunctional: Boolean = false               // informs about functionality of a card (2,3,4,J,Q,K_spades, K_hearts,A)
+    private var wasPlayed: Boolean = false                  // variable connected to "isFunctional" one - tells if an action card was already used (there is no penalty)
+
     private var isSelected: Boolean = false
     private var isSelectedOnTop: Boolean = false
 
-    constructor(imageCard: Int, type: HouseType = HouseType.none, value: CardValue = CardValue.none){
+    constructor(imageCard: Int, type: HouseType = HouseType.none, value: CardValue = CardValue.none, function: Boolean = false){
         this.cardID = imageCard
         this.type = type
         this.value = value
+        this.isFunctional = function
     }
 
     fun getCardId(): Int {
@@ -86,5 +90,13 @@ class CardItem {
 
     fun isSelectedOnTop(): Boolean{
         return this.isSelectedOnTop
+    }
+
+    fun isFunctional(): Boolean{
+        return this.isFunctional
+    }
+
+    fun setFunctional(){
+        isFunctional = true
     }
 }

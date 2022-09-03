@@ -13,6 +13,7 @@ class Player(playerName: String, playerNumber: Int, context: Context, cardManage
     private var uniquePlayerID: Int = 123
     private var playerName: String = "Player"
     private var playerNumber: Int = 0
+    private var awaitingRoundsPenalty: Int = 0
 
     init {
         this.playerName = playerName
@@ -31,5 +32,14 @@ class Player(playerName: String, playerNumber: Int, context: Context, cardManage
 
     fun getCards(): ArrayList<CardItem>{
         return playerCards
+    }
+
+    fun setHaltRoundsPenalty(quantity: Int){
+        awaitingRoundsPenalty = quantity
+    }
+
+    fun decreaseRoundsPenalty(){
+        if(awaitingRoundsPenalty > 1)
+            awaitingRoundsPenalty--
     }
 }

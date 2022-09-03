@@ -32,7 +32,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonPlay.setOnClickListener {
+        binding.buttonPlayLocalMulti.setOnClickListener {
             findNavController().navigate(R.id.action_MainFragment_to_GameLocalMultiplayer)
         }
     }
