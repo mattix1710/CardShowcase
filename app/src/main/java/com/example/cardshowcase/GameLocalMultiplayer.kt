@@ -33,8 +33,6 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     // card info among the players
     //
     private lateinit var cardManager: CardManager
-    private var penalty: Int = 0
-    private var penaltyArise: Boolean = false
     //
     //////////////////////////////////////////////
 
@@ -45,7 +43,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
     //////////////////////////////////////////////
     // private player card info
     //
-    private var currentPlayerNum: Int = 2
+    private var currentPlayerNum: Int = 0
     private var players = ArrayList<Player>()
     private var playerCardNum = ArrayList<TextView>()
     private var playerCardTile = ArrayList<CardView>()
@@ -138,7 +136,6 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
 
         val newPlayerDialog = AlertDialog.Builder(requireContext())
         val message = players[currentPlayerNum].getName() + " will play its turn!"
-        //newPlayerDialog.setTitle(title)
         newPlayerDialog.setMessage(message)
         newPlayerDialog.setCancelable(false)
         newPlayerDialog.setPositiveButton("I'm ready!",
@@ -151,7 +148,15 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                 binding.cardListView!!.bringToFront()
 
                 if(cardManager.currentPenalty.enabled()){
-                    penaltyCheckerAlertDialog()
+                    if(cardManager.currentPenalty.toBeReset)
+                        cardManager.currentPenalty.reset()
+                    else {
+                        if (cardManager.currentPenalty.penaltySetter == players[currentPlayerNum]) {
+                            // set flag that after this round the penalty will be reset - the end of whole round
+                            cardManager.currentPenalty.toBeReset = true
+                        }
+                        penaltyCheckerAlertDialog()
+                    }
                 }
             })
         newPlayerDialog.create().show()
@@ -191,11 +196,11 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
             cardManager.currentPenalty.drawSum--
             drawCardPenaltyAlertDialog()
         } else {
-            if(players[currentPlayerNum].getCards().last() == cardManager.displayedCard)
+            if(players[currentPlayerNum].getCards().last().matches(cardManager.displayedCard))      // if currently draw card could be played
                 drawCardRegularAlertDialog()
             else {
                 players[currentPlayerNum].resetSelectedCards()
-                cardManager.currentPenalty.reset()
+                //cardManager.currentPenalty.reset()
                 newPlayerAlert()
                 updatePlayerInfo()
             }
@@ -288,6 +293,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                     // if current player has revenge card OR same action card
                     if(card.getCardValue() == cardManager.currentPenalty.getDemandedFigure()
                         || card.getCardValue() == CardValue.jack){
+                        message += ",\nbut you can play in revenge!"
                         canRevenge = true
                         break
                     }
@@ -300,6 +306,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                     // if current player has revenge card OR same action card
                     if(card.getCardType() == cardManager.currentPenalty.getDemandedHouse()
                         || card.getCardValue() == CardValue.ace){
+                        message += ",\nbut you can play in revenge!"
                         canRevenge = true
                         break
                     }
@@ -384,7 +391,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         }
         dialogBuilder.setNegativeButton(negButtonMessage,
             DialogInterface.OnClickListener { dialogInterface, i ->
-                cardManager.currentPenalty.reset()
+                //cardManager.currentPenalty.reset()
                 players[currentPlayerNum].resetRevenge()
                 drawCards(cardManager.currentPenalty.drawSum)
             })
@@ -412,7 +419,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
         dialogBuilder.setNegativeButton(negButtonMess,
             DialogInterface.OnClickListener { dialogInterface, i ->
                 players[currentPlayerNum].resetSelectedCards()
-                cardManager.currentPenalty.reset()
+                //cardManager.currentPenalty.reset()
                 newPlayerAlert()
                 updatePlayerInfo()
             })
@@ -420,7 +427,7 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
 
     private fun demandedFigureAlertDialog(){
         val singleItems = arrayOf("5", "6", "7", "8", "9", "10")
-        if(cardManager.queenFunctional)
+        if(!cardManager.queenFunctional)
             singleItems.plus("Queen")
         var checkedItem = 0
 
@@ -446,6 +453,9 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                 }
                 cardManager.currentPenalty.type = Penalty.PenaltyType.demandFigure
                 cardManager.currentPenalty.setPenalty(arrayListOf(cardManager.displayedCard))
+                // set info which player demanded this figure - and then, when whole round will come to an end, reset the penalty
+                cardManager.currentPenalty.penaltySetter = players[currentPlayerNum]
+
                 playCardsUpdate()
             }
             .setSingleChoiceItems(singleItems, checkedItem){ dialog, which ->
@@ -480,6 +490,8 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                     else -> cardManager.currentPenalty.demandedHouse = Penalty.DemandHouse.none
                 }
                 cardManager.currentPenalty.type = Penalty.PenaltyType.demandHouse
+                // set info which player demanded this figure - and then, when whole round will come to an end, reset the penalty
+                cardManager.currentPenalty.penaltySetter = players[currentPlayerNum]
                 cardManager.currentPenalty.setPenalty(arrayListOf(cardManager.displayedCard))
                 playCardsUpdate()
             }

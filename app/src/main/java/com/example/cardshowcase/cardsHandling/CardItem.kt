@@ -99,4 +99,9 @@ class CardItem {
     fun setFunctional(){
         isFunctional = true
     }
+
+    fun matches(card: CardItem): Boolean{
+        if(type == card.type || value == card.value) return true
+        return false
+    }
 }

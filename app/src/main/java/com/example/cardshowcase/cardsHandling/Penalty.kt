@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.example.cardshowcase.R
+import com.example.cardshowcase.playerHandling.Player
 import java.lang.Error
 import java.lang.Exception
 
@@ -16,6 +17,9 @@ class Penalty(val context: Context, val penaltyInfo: TextView){
     var numOfRounds: Int = 0
     var demandedHouse: DemandHouse = DemandHouse.none
     var demandedFigure: DemandFigure = DemandFigure.none
+
+    var penaltySetter: Player? = null
+    var toBeReset: Boolean = false
 
     enum class PenaltyType{
         none, draw, drawBack, demandHouse, demandFigure, stop
@@ -35,6 +39,10 @@ class Penalty(val context: Context, val penaltyInfo: TextView){
         numOfRounds = 0
         demandedHouse = DemandHouse.none
         demandedFigure = DemandFigure.none
+
+        penaltySetter = null
+        toBeReset = false
+
         penaltyInfo.setText("-")
         penaltyInfo.setTextColor(ContextCompat.getColor(context, R.color.penalty_none))
     }
