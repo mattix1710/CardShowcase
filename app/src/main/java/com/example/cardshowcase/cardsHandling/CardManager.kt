@@ -1,15 +1,10 @@
 package com.example.cardshowcase.cardsHandling
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
-import android.util.Log
-import android.view.LayoutInflater
 import android.widget.*
 import com.example.cardshowcase.R
-import com.example.cardshowcase.playerHandling.PlayersCards
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.w3c.dom.Text
+import kotlin.random.Random
 
 enum class DemandedTypeSelector{
     none, Jack, Ace, wrongCards
@@ -46,7 +41,7 @@ class CardManager(val context: Context, val penaltyInfo: TextView){
 
     private fun randomizer(minSize: Int, maxSize: Int, includesMax: Boolean = false): Int{
         return if(includesMax)
-            (minSize .. maxSize).random()
+            (minSize .. maxSize).random() //TODO: Random(Clock.System.now().toEpochMilliseconds()))
         else
             (minSize until maxSize).random()
     }
