@@ -93,9 +93,34 @@ class CardManager(val context: Context, val penaltyInfo: TextView){
     }
 
     fun randomizeInitCards(): ArrayList<CardItem>{
-        var array: ArrayList<CardItem> = ArrayList()
+        val array: ArrayList<CardItem> = ArrayList()
 
         for(it in 1..5){
+            val randomizedCard: CardItem =
+                currentFreeCards.get(randomizer(0, currentFreeCards.size, false))
+            array.add(randomizedCard)
+            currentFreeCards.remove(randomizedCard)
+        }
+        return array
+    }
+
+    // INFO: debugging function - for temporary use
+    fun debug_randomizeInitCards(quantityRandom: Int = 5, wantedCards: ArrayList<CardItem>): ArrayList<CardItem>{
+        val array: ArrayList<CardItem> = ArrayList()
+
+        // set custom cards for players...
+        for(card in wantedCards){
+            Log.i("WANTED", card.display())
+            for(free in currentFreeCards){
+                if(free.sameAs(card)) {
+                    array.add(free)
+                    currentFreeCards.remove(free)
+                    break
+                }
+            }
+        }
+
+        for(it in 1..quantityRandom){
             var randomizedCard: CardItem =
                 currentFreeCards.get(randomizer(0, currentFreeCards.size, false))
             array.add(randomizedCard)
@@ -149,19 +174,21 @@ class CardManager(val context: Context, val penaltyInfo: TextView){
                         demandedType = DemandedTypeSelector.Jack//demandedFigureAlertDialog()
                     } else if (card.getCardValue() == CardValue.ace) {
                         demandedType = DemandedTypeSelector.Ace//demandedHouseAlertDialog()
-                    } else {
+                    } else {    // ERROR: for 2s and 3s PENALTY is NOT visible
                         currentPenalty.setPenalty(cardsChosen)
                         break
                     }
                 }
             }
-
             manageUsedCards(cardsChosen, playerCards, displayedImg, displayedInfo, penaltyInfo)
         }
 
         return demandedType
     }
 
+    /**
+     * manage used cards - change displayed card, add the rest of played cards to the usedCards stack
+     * **/
     fun manageUsedCards(cardsChosen: ArrayList<CardItem>, playerCards: ArrayList<CardItem>,
                         displayedImg: ImageView, displayedInfo: TextView, penaltyInfo: TextView){
         // set card ON TOP as a displayedCard

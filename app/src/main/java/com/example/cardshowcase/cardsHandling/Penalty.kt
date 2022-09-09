@@ -2,6 +2,7 @@ package com.example.cardshowcase.cardsHandling
 
 import android.content.Context
 import android.content.res.Resources
+import android.util.Log
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -166,6 +167,7 @@ class Penalty(val context: Context, val penaltyInfo: TextView){
                     return true
             }
             PenaltyType.demandFigure -> {
+                Log.i("DEMANDED", "CORRECTLY")
                 if(getDemandedFigure() == card.getCardValue()
                     || card.getCardValue() == CardValue.jack)
                     return true
@@ -211,21 +213,24 @@ class Penalty(val context: Context, val penaltyInfo: TextView){
     fun setPenalty(cards: ArrayList<CardItem>){
         var quantity = cards.size
         var value = cards[0].getCardValue()
+
+        Log.i("CURRENT CARD VALUE", value.toString())
         //var onTop = for(card in cards)
         penaltyInfo.setTextColor(ContextCompat.getColor(context, R.color.penalty_current))
 
         when(value){
             CardValue.two -> {
+                Log.i("PENALTY CHOICE", value.toString())
                 setDrawCards(2, quantity)
-                penaltyInfo.setText("Draw ${quantity.toString()} cards")
+                penaltyInfo.setText("Draw ${drawSum.toString()} cards")
             }
             CardValue.three -> {
                 setDrawCards(3, quantity)
-                penaltyInfo.setText("Draw ${quantity.toString()} cards")
+                penaltyInfo.setText("Draw ${drawSum.toString()} cards")
             }
             CardValue.four -> {
                 setHaltPlayer(quantity)
-                penaltyInfo.setText("Wait for ${quantity.toString()} round/s")
+                penaltyInfo.setText("Wait for ${drawSum.toString()} round/s")
             }
             CardValue.jack -> {
                 //setDemandFigure()
@@ -242,6 +247,9 @@ class Penalty(val context: Context, val penaltyInfo: TextView){
                     }
                 }
                 setDrawCards()
+            }
+            CardValue.ace -> {
+                penaltyInfo.setText("Play ${demandedHouse}")
             }
             else -> {}
         }

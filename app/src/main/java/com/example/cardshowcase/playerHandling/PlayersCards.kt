@@ -46,9 +46,15 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
             selectedCards.selectionValue = card.getCardValue()
             Toast.makeText(context, "${card.getCardValueName()} of ${card.getCardType().toString()} will be ON TOP!", Toast.LENGTH_SHORT).show()
         } else if(selectedCards.list.contains(position)){       // if current card was selected - unselect it!
+
+            selectedCards.list.remove(position)             // remove this card from selected list
+
+            if(card.isSelectedOnTop() && !selectedCards.list.isEmpty()){    // if removed card was selected ON TOP
+                playerCards[selectedCards.list[0]].setSelectedOnTop()       // set first card in selected list as selected ON TOP
+            }
+
             card.resetSelected()
-            selectedCards.list.remove(position)
-            if(selectedCards.list.isEmpty()){
+            if(selectedCards.list.isEmpty()){                   // if it was the only one card selected - clean the record
                 resetSelectedCards()
             }
             Toast.makeText(context, "${card.getCardValueName()} of ${card.getCardType().toString()} was unselected!", Toast.LENGTH_SHORT).show()
@@ -123,6 +129,7 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
                   penaltyInfo: TextView): DemandedTypeSelector {
 
         val chosenCards = ArrayList<CardItem>()
+        val size = selectedCards.list.size
         for(i in selectedCards.list)
             chosenCards.add(playerCards[i])
 
@@ -130,12 +137,13 @@ open class PlayersCards(val context: Context, val cardManager: CardManager) {
 
         if(revengeActive){              // if player has pending penalty, but have a card to REVENGE
             for(card in chosenCards){
-                if(card.isSelected()){  // if card was selected (NOT on top)
+                Log.i("CHOSEN", card.getCardValueName())
+                if(card.isSelected() || size == 1){  // if card was selected (NOT on top) OR there is only one card selected
                     if(cardManager.currentPenalty.check(card, cardManager.displayedCard)){  // check if matches the demand
                         cardManager.managePlayingCards(chosenCards, playerCards,
                             displayedCard, displayedCardInfo, penaltyInfo)
                         resetSelectedCards()
-                        if(!cardManager.currentPenalty.penaltyMultiplied())
+                        if(!cardManager.currentPenalty.penaltyMultiplied())                 // if current penalty isn't stackable
                             cardManager.currentPenalty.reset()
                         resetRevenge()
                         return demandedType

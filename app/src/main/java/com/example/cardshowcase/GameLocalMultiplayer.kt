@@ -75,8 +75,12 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
 //            findNavController().navigate(R.id.action_GameLocalMultiplayer_to_MainFragment)
 //        }
 
+        // INFO: for debug purposes only!
+        var tempList: ArrayList<CardItem> = ArrayList<CardItem>()
+        tempList.add(CardItem(R.drawable.card_diamonds_a, HouseType.Diamonds, CardValue.ace, true))
+
         // initialize players and draw cards to their hands
-        players.add(Player("Player 1", playerNumber = 0, requireContext(), cardManager))
+        players.add(Player("Player 1", playerNumber = 0, requireContext(), cardManager, tempList))
         players.add(Player("Player 2", playerNumber = 1, requireContext(), cardManager))
         players.add(Player("Player 3", playerNumber = 2, requireContext(), cardManager))
         players.add(Player("Player 4", playerNumber = 3, requireContext(), cardManager))
@@ -394,6 +398,9 @@ class GameLocalMultiplayer : Fragment(), CardListListener {
                 //cardManager.currentPenalty.reset()
                 players[currentPlayerNum].resetRevenge()
                 drawCards(cardManager.currentPenalty.drawSum)
+
+                // TODO: ERROR: while playing Aces - it resets when the player draws the card (but whole round wasn't played yet)
+                cardManager.currentPenalty.reset()
             })
 
         val alert = dialogBuilder.create().show()

@@ -73,6 +73,7 @@ class CardItem {
 
     fun setSelected(){
         this.isSelected = true
+        this.isSelectedOnTop = false
     }
 
     fun resetSelected(){
@@ -81,6 +82,7 @@ class CardItem {
     }
 
     fun setSelectedOnTop(){
+        this.isSelected = false
         this.isSelectedOnTop = true
     }
 
@@ -103,5 +105,14 @@ class CardItem {
     fun matches(card: CardItem): Boolean{
         if(type == card.type || value == card.value) return true
         return false
+    }
+
+    fun sameAs(card: CardItem): Boolean{
+        if(type == card.type && value == card.value) return true
+        return false
+    }
+
+    fun display(): String{
+        return "${getCardValueName()} of ${type}"
     }
 }
