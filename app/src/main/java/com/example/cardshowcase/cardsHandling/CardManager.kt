@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.*
 import com.example.cardshowcase.R
+import android.util.Log
 import kotlin.random.Random
 
 enum class DemandedTypeSelector{
