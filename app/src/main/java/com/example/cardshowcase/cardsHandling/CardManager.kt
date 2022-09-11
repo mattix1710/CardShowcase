@@ -5,7 +5,7 @@ import android.content.Context
 import android.widget.*
 import com.example.cardshowcase.R
 import android.util.Log
-import kotlin.random.Random
+import java.util.Random
 
 enum class DemandedTypeSelector{
     none, Jack, Ace, wrongCards
@@ -41,10 +41,12 @@ class CardManager(val context: Context, val penaltyInfo: TextView){
     }
 
     private fun randomizer(minSize: Int, maxSize: Int, includesMax: Boolean = false): Int{
+        val rand = Random()
+
         return if(includesMax)
-            (minSize .. maxSize).random() //TODO: Random(Clock.System.now().toEpochMilliseconds()))
+            rand.nextInt(maxSize - minSize + 1) + minSize
         else
-            (minSize until maxSize).random()
+            rand.nextInt(maxSize-1 - minSize + 1) + minSize
     }
 
     fun setDisplayedCardImage(view: ImageView){
