@@ -3,6 +3,22 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/drawable/dialog_corner_style.xml" value="0.2985" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout-sw600dp/activity_main.xml" value="0.2260928961748634" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout-w600dp/bluetooth_layout.xml" value="0.30599647266313934" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/activity_bluetooth.xml" value="0.29981884057971014" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/activity_main.xml" value="0.12158054711246201" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/bluetooth_activity.xml" value="0.33" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/change_device_name_dialog.xml" value="0.2260928961748634" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/content_main.xml" value="0.12158054711246201" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/fragment_main.xml" value="0.12158054711246201" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/instructions_dialog.xml" value="0.25" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/manual_dialog.xml" value="0.33" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/new_player_dialog.xml" value="0.12158054711246201" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/paired_devices_list.xml" value="0.2260928961748634" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/scanned_devices_list.xml" value="0.29981884057971014" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/layout/single_card.xml" value="0.12158054711246201" />
+        <entry key="..\:/My_Application/CardShowcase/app/src/main/res/menu/menu_main.xml" value="0.24615384615384617" />
         <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/drawable-v24/card_background_selected_on_top.xml" value="0.1075" />
         <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/drawable/background_rectangle.xml" value="0.204" />
         <entry key="..\:/Users/MATI/AndroidStudioProjects/CardShowcase/app/src/main/res/drawable/card_background_highlight.xml" value="0.1935" />
